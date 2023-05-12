@@ -26,3 +26,7 @@
   (assert (string-contains (battery-info-text) "Li"))
   (assert (string-contains (battery-info-text) "po")))
 
+(test capacity
+  (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96)))
+  (assert (string-contains (battery-info-text) "48 Wh"))
+  (assert (string-contains (battery-info-text) "96%")))

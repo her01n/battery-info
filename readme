@@ -13,14 +13,13 @@ Information is collected using UPower DBus interface
 (https://upower.freedesktop.org/docs/Device.html),
 with the *gdbus* client from *Gio* library.
 User interface is displayed using *Adw* and *Gtk* libraries.
+
+I would like to number of cells, or nominal voltage to battery information.
+This is not provided by UPower interface.
+It may be guessed by the technology, voltage and state values.
   
 ## TODO
 
-- is it possible to determine nominal voltage or the cell count?
-- display battery capacity as:
-  - human wording
-  - actual capacity value, percent
-  - meter gauge
 - paint an icon
 - faster launch
 - display an error if the upower is missing or returning errors

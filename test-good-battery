@@ -1,0 +1,20 @@
+#!/usr/bin/guile
+!#
+
+(add-to-load-path (dirname (current-filename)))
+
+(use-modules (ice-9 threads))
+
+(use-modules (battery info))
+
+(join-thread
+  (show-battery-info
+    (lambda ()
+      '((vendor . "ACME")
+        (model . "B1")
+        (energy-full-design . 99)
+        (technology . 2)
+        (energy-full . 90)
+        (capacity . 90)))))
+        
+

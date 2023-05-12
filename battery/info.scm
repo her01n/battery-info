@@ -16,8 +16,12 @@
   (for-each (lambda (child) (append box child)) children)
   box)
 
-(define (heading title)
-  (make <gtk-label> #:label title #:css-classes '("title-1") #:margin-top 5 #:margin-bottom 5))
+(define (hx class margin)
+  (lambda (title)
+    (make <gtk-label> #:label title #:css-classes (list class) #:margin-top margin #:margin-bottom margin)))
+
+(define h1 (hx "title-1" 5))
+(define h2 (hx "title-2" 5))
 
 (define (info-line description value)
   (define label (make <gtk-label>))
@@ -26,13 +30,13 @@
   
 (define (battery-info info)
   (vertical-box
-    (heading
+    (h1
       (let ((vendor (or (assoc-ref info 'vendor) ""))
             (model (or (assoc-ref info 'model) "")))
         (if (or (not (equal? "" vendor)) (not (equal? "" model)))
           (format #f "~a ~a" vendor model)
           "Unknown Battery")))
-    (info-line "Nominal Capacity"
+    (info-line "Nominal capacity"
       (match (assoc-ref info 'energy-full-design)
         ((and (? real?) (not 0.0) energy-full-design)
          (format #f "~a Wh" energy-full-design))
@@ -45,12 +49,23 @@
         (4 "Lead acid")
         (5 "Nickel cadmium")
         (6 "Nickel metal hydride")
-        (else "Unknown")))))
+        (else "Unknown")))
+    (h2 "Health")
+    (info-line "Actual capacity"
+      (match (assoc-ref info 'energy-full)
+        ((and (? real?) (not 0.0) energy-full) (format #f "~a Wh" energy-full))
+        (else "Unknown")))
+    (info-line "Capacity percentage"
+      (match (assoc-ref info 'capacity)
+        ((and (? real?) (not 0.0) capacity) (format #f "~a%" (round capacity)))
+        (else "Unknown"))))) 
 
 (define (present-window app info)
   (define window (make <gtk-application-window> #:application app #:title "Battery Info"))
   (define content (if info (battery-info info) (no-battery)))
-  (set-child window content)
+  (define wrapper (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10 #:margin-left 10 #:margin-right 10))
+  (append wrapper content)
+  (set-child window wrapper)
   (set-default-size window 400 400)
   (present window))
 
@@ -130,7 +145,9 @@
           `((vendor . ,(get-property proxy "Vendor"))
             (model . ,(get-property proxy "Model"))
             (energy-full-design . ,(get-property proxy "EnergyFullDesign"))
-            (technology . ,(get-property proxy "Technology")))))
+            (technology . ,(get-property proxy "Technology"))
+            (energy-full . ,(get-property proxy "EnergyFull"))
+            (capacity . ,(get-property proxy "Capacity")))))
       devices-names)))
 
 (define-public (main args)
