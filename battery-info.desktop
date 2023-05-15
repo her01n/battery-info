@@ -2,4 +2,5 @@
 Type=Application
 Name=Battery Info
 Exec=battery-info
+Icon=com.her01n.BatteryInfo
 
