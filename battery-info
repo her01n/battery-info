@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
-guile -e "(@ (battery info) main)" -L $(dirname "$0") /dev/null "$@"
+guile -L $(dirname "$0") -c "((@ (battery info) main) (command-line))"
 

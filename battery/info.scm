@@ -4,10 +4,13 @@
 
 (use-modules (g-golf))
 
-(gi-import "Gio")
 (g-irepository-require "Gtk" #:version "4.0")
-(gi-import "Gtk")
-(gi-import "Adw")
+
+(gi-import-by-name "Gio" "DBusProxy")
+(gi-import-by-name "Gtk" "ApplicationWindow")
+(gi-import-by-name "Gtk" "Box")
+(gi-import-by-name "Gtk" "Label")
+(gi-import-by-name "Adw" "StatusPage")
 
 (define (no-battery) (make <adw-status-page> #:title "No battery detected."))
 
@@ -95,8 +98,6 @@
 
 (define-public (battery-info-text)
   (text (get-active-window app)))
-
-(gi-import "Gio")
 
 (define (g-variant->scm variant)
   (define (g-variant->list)

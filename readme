@@ -51,7 +51,11 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 - g-irepository-get-infos should work
 - object info from g-irepository-get-info should have nice string representation
 
-- gvariants should be handled better
+- gvariants should be handled better:
+  - two functions to convert between a variant and scheme value
+  - accept scheme values in place of gvariant arguments.
+
+- how can i get
 
 - g-golf browser?
 
