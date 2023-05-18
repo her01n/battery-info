@@ -1,18 +1,29 @@
 (define-module (battery info))
 
-(use-modules (ice-9 threads) (sxml simple) (sxml xpath))
+(use-modules (ice-9 exceptions) (ice-9 threads) (sxml simple) (sxml xpath))
 
 (use-modules (g-golf))
 
 (g-irepository-require "Gtk" #:version "4.0")
 
 (gi-import-by-name "Gio" "DBusProxy")
-(gi-import-by-name "Gtk" "ApplicationWindow")
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Label")
+(gi-import-by-name "Adw" "HeaderBar")
+(gi-import-by-name "Adw" "Application")
+(gi-import-by-name "Adw" "ApplicationWindow")
 (gi-import-by-name "Adw" "StatusPage")
 
-(define (no-battery) (make <adw-status-page> #:title "No battery detected."))
+(define (no-battery)
+  (make <adw-status-page>
+    #:icon-name "system-search-symbolic"
+    #:title "No battery detected."))
+
+(define (info-error exception)
+  (make <adw-status-page>
+    #:icon-name "dialog-error-symbolic"
+    #:title "Error reading battery info"
+    #:description (exception-message exception)))
 
 (define (vertical-box . children)
   (define box (make <gtk-box> #:orientation 'vertical))
@@ -64,19 +75,30 @@
         (else "Unknown"))))) 
 
 (define (present-window app info)
-  (define window (make <gtk-application-window> #:application app #:title "Battery Info"))
-  (define content (if info (battery-info info) (no-battery)))
-  (define wrapper (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10 #:margin-left 10 #:margin-right 10))
-  (append wrapper content)
-  (set-child window wrapper)
+  (define content
+    (match info
+      (#f (no-battery))
+      ((? exception? exception) (info-error exception))
+      (info (battery-info info))))
+  (define bordered
+    (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
+      #:margin-left 10 #:margin-right 10))
+  (append bordered content)
+  (define view (vertical-box (make <adw-header-bar>) bordered))
+  (define window
+    (make <adw-application-window> #:application app #:content view
+      #:title "Battery Info"))
   (set-default-size window 400 400)
   (present window))
 
 (define app #f)
 
 (define-public (show-battery-info get-info)
-  (set! app (make <gtk-application> #:application-id "com.her01n.Battery-Info"))
-  (connect app 'activate (lambda (app) (present-window app (get-info))))
+  (set! app (make <adw-application> #:application-id "com.her01n.Battery-Info"))
+  (connect app 'activate
+    (lambda (app)
+      (define info (with-exception-handler identity get-info #:unwind? #t))
+      (present-window app info)))
   (begin-thread (run app '())))
 
 (define-public (close-battery-info)

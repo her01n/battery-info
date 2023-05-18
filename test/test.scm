@@ -30,3 +30,9 @@
   (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96)))
   (assert (string-contains (battery-info-text) "48 Wh"))
   (assert (string-contains (battery-info-text) "96%")))
+
+(test error
+  (hook (close-battery-info))
+  (show-battery-info (lambda () (error "test error")))
+  (sleep 1)
+  (assert (string-contains (battery-info-text) "Error")))
