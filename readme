@@ -24,7 +24,6 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- make the info text selectable or otherwise copyable
 - display a spinner if dbus is taking too long
 - display current battery state
   - state (charging, discharging, full, ...)

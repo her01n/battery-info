@@ -6,13 +6,17 @@
 
 (g-irepository-require "Gtk" #:version "4.0")
 
+(gi-import-by-name "Gdk" "Clipboard")
+(gi-import-by-name "Gdk" "Display")
 (gi-import-by-name "Gio" "DBusProxy")
 (gi-import-by-name "Gtk" "Box")
+(gi-import-by-name "Gtk" "Button")
 (gi-import-by-name "Gtk" "Label")
 (gi-import-by-name "Adw" "HeaderBar")
 (gi-import-by-name "Adw" "Application")
 (gi-import-by-name "Adw" "ApplicationWindow")
 (gi-import-by-name "Adw" "StatusPage")
+(gi-import-by-name "Adw" "ToastOverlay")
 
 (define (no-battery)
   (make <adw-status-page>
@@ -32,24 +36,42 @@
 
 (define (hx class margin)
   (lambda (title)
-    (make <gtk-label> #:label title #:css-classes (list class) #:margin-top margin #:margin-bottom margin)))
+    (make <gtk-label> #:selectable #t #:label title #:css-classes (list class) #:margin-top margin #:margin-bottom margin)))
 
 (define h1 (hx "title-1" 5))
 (define h2 (hx "title-2" 5))
 
 (define (info-line description value)
-  (define label (make <gtk-label>))
+  (define label (make <gtk-label> #:selectable #t))
   (set-markup label (format #f "~a <b>~a</b>" description value))
   label)
-  
-(define (battery-info info)
+
+(define (get-children component)
+  (define (siblings component)
+    (if component (cons component (siblings (get-next-sibling component))) (list)))
+  (siblings (get-first-child component)))
+
+(define (text component)
+  (cond
+    ((is-a? component <adw-application-window>) (text (get-content component)))
+    ((is-a? component <adw-status-page>)
+     (format #f "~a ~a" (get-title component) (get-description component)))
+    ((is-a? component <adw-toast-overlay>) (text (get-child component)))
+    ((is-a? component <gtk-box>) (string-join (map text (get-children component)) "\n"))
+    ((is-a? component <gtk-window>) (text (get-child component)))
+    ((is-a? component <gtk-label>) (get-text component))
+    (else (format #f "~a" component))))
+
+(define (title info)
+  (define vendor (or (assoc-ref info 'vendor) ""))
+  (define model (or (assoc-ref info 'model) ""))
+  (if (or (not (equal? "" vendor)) (not (equal? "" model)))
+    (format #f "~a ~a" vendor model)
+    "Unknown Battery"))
+
+(define (layout info)
   (vertical-box
-    (h1
-      (let ((vendor (or (assoc-ref info 'vendor) ""))
-            (model (or (assoc-ref info 'model) "")))
-        (if (or (not (equal? "" vendor)) (not (equal? "" model)))
-          (format #f "~a ~a" vendor model)
-          "Unknown Battery")))
+    (h1 (title info))
     (info-line "Nominal capacity"
       (match (assoc-ref info 'energy-full-design)
         ((and (? real?) (not 0.0) energy-full-design)
@@ -72,7 +94,26 @@
     (info-line "Capacity percentage"
       (match (assoc-ref info 'capacity)
         ((and (? real?) (not 0.0) capacity) (format #f "~a%" (round capacity)))
-        (else "Unknown"))))) 
+        (else "Unknown")))))
+
+(define (copy-to-clipboard text)
+  (define clipboard (get-clipboard (gdk-display-get-default)))
+  (set clipboard text))
+
+(define (battery-info info)
+  (define view (layout info))
+  (define copy-button (make <gtk-button> #:label "Copy to clipboard" #:margin-top 10 #:halign 'center))
+  (define toast-overlay (make <adw-toast-overlay> #:child view))
+  (define previous-toast #f)
+  (connect copy-button 'clicked
+    (lambda (b)
+      (copy-to-clipboard (text view))
+      (if previous-toast (dismiss previous-toast))
+      (let ((toast (make <adw-toast> #:title "Info copied to clipboard.")))
+        (add-toast toast-overlay toast)
+        (if previous-toast (unref previous-toast))
+        (set! previous-toast (ref toast)))))
+  (vertical-box toast-overlay copy-button))
 
 (define (present-window app info)
   (define content
@@ -105,21 +146,10 @@
   (and app (get-active-window app) (gtk-window-close (get-active-window app)))
   (sleep 1))
 
-(define (get-children component)
-  (define (siblings component)
-    (if component (cons component (siblings (get-next-sibling component))) (list)))
-  (siblings (get-first-child component)))
-
-(define (text component)
-  (cond
-    ((is-a? component <gtk-box>) (string-join (map text (get-children component)) "\n"))
-    ((is-a? component <gtk-window>) (text (get-child component)))
-    ((is-a? component <gtk-label>) (get-text component))
-    ((is-a? component <adw-status-page>) (get-title component))
-    (else (format #f "~a" component))))
-
 (define-public (battery-info-text)
   (text (get-active-window app)))
+
+(define-public (battery-info-window) (get-active-window app))
 
 (define (g-variant->scm variant)
   (define (g-variant->list)
