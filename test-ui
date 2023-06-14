@@ -3,23 +3,25 @@
 
 (use-modules (ice-9 match) (ice-9 threads))
 
+(define (delayed value) (lambda () (usleep (* 200 1000)) value))
+
 (define test-get-info
   (match (command-line)
     ((or (cmd) (cmd "good-battery"))
-     (const
+     (delayed
        '((vendor . "ACME")
          (model . "B1")
          (energy-full-design . 99)
          (technology . 2)
          (energy-full . 90)
          (capacity . 90))))
-    ((cmd "no-battery") (const #f))
-    ((cmd "error") (lambda () (error "test error")))
-    (else (error "Please specify test from: good-battery no-battery error"))))
+    ((cmd "no-battery") (delayed #f))
+    ((cmd "error") (lambda () (sleep 1) (error "test error")))
+    ((cmd "loading") (lambda () (sleep 99) '((vendor . "ACME"))))
+    (else (error "Please specify test from: good-battery no-battery error loading"))))
 
 (add-to-load-path (dirname (current-filename)))
 (use-modules (battery info))
 
 (join-thread (show-battery-info test-get-info))
-        
 

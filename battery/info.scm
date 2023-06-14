@@ -1,6 +1,8 @@
 (define-module (battery info))
 
-(use-modules (ice-9 exceptions) (ice-9 threads) (sxml simple) (sxml xpath))
+(use-modules
+  (ice-9 atomic) (ice-9 exceptions) (ice-9 threads)
+  (sxml simple) (sxml xpath))
 
 (use-modules (g-golf))
 
@@ -12,11 +14,31 @@
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Button")
 (gi-import-by-name "Gtk" "Label")
+(gi-import-by-name "Gtk" "Spinner")
 (gi-import-by-name "Adw" "HeaderBar")
 (gi-import-by-name "Adw" "Application")
 (gi-import-by-name "Adw" "ApplicationWindow")
 (gi-import-by-name "Adw" "StatusPage")
 (gi-import-by-name "Adw" "ToastOverlay")
+
+(define (vertical-box . children)
+  (define box (make <gtk-box> #:orientation 'vertical))
+  (for-each (lambda (child) (append box child)) children)
+  box)
+
+(define (hx class margin)
+  (lambda* (title #:key selectable)
+    (make <gtk-label> #:selectable selectable #:label title #:css-classes (list class)
+      #:margin-top margin #:margin-bottom margin)))
+
+(define h1 (hx "title-1" 5))
+(define h2 (hx "title-2" 5))
+
+(define (loading)
+  (define spinner (make <gtk-spinner> #:margin-top 40 #:margin-bottom 40
+    #:width-request 40 #:height-request 40))
+  (start spinner)
+  (vertical-box spinner (h1 "Loading")))
 
 (define (no-battery)
   (make <adw-status-page>
@@ -29,24 +51,12 @@
     #:title "Error reading battery info"
     #:description (exception-message exception)))
 
-(define (vertical-box . children)
-  (define box (make <gtk-box> #:orientation 'vertical))
-  (for-each (lambda (child) (append box child)) children)
-  box)
-
-(define (hx class margin)
-  (lambda (title)
-    (make <gtk-label> #:selectable #t #:label title #:css-classes (list class) #:margin-top margin #:margin-bottom margin)))
-
-(define h1 (hx "title-1" 5))
-(define h2 (hx "title-2" 5))
-
 (define (info-line description value)
   (define label (make <gtk-label> #:selectable #t))
   (set-markup label (format #f "~a <b>~a</b>" description value))
   label)
 
-(define (get-children component)
+(define-public (get-children component)
   (define (siblings component)
     (if component (cons component (siblings (get-next-sibling component))) (list)))
   (siblings (get-first-child component)))
@@ -71,7 +81,7 @@
 
 (define (layout info)
   (vertical-box
-    (h1 (title info))
+    (h1 (title info) #:selectable #t)
     (info-line "Nominal capacity"
       (match (assoc-ref info 'energy-full-design)
         ((and (? real?) (not 0.0) energy-full-design)
@@ -100,6 +110,13 @@
   (define clipboard (get-clipboard (gdk-display-get-default)))
   (set clipboard text))
 
+(define-syntax define-traced
+  (syntax-rules ()
+    ((define-traced (name ...) exp ...)
+     (define (name ...)
+       (format #t "trace ~a\n" (list name ...))
+       ((lambda () exp ...))))))
+
 (define (battery-info info)
   (define view (layout info))
   (define copy-button (make <gtk-button> #:label "Copy to clipboard" #:margin-top 10 #:halign 'center))
@@ -115,31 +132,51 @@
         (set! previous-toast (ref toast)))))
   (vertical-box toast-overlay copy-button))
 
-(define (present-window app info)
+(define (window-content state)
   (define content
-    (match info
-      (#f (no-battery))
+    (match (atomic-box-ref state)
+      ('loading (loading))
+      ('no-battery (no-battery))
       ((? exception? exception) (info-error exception))
       (info (battery-info info))))
   (define bordered
     (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
       #:margin-left 10 #:margin-right 10))
   (append bordered content)
-  (define view (vertical-box (make <adw-header-bar>) bordered))
+  (vertical-box (make <adw-header-bar>) bordered))
+
+(define (present-window app)
   (define window
-    (make <adw-application-window> #:application app #:content view
-      #:title "Battery Info"))
+    (make <adw-application-window> #:application app #:title "Battery Info"))
   (set-default-size window 400 400)
   (present window))
+
+(define (update app state)
+  (define window (get-active-window app))
+  (define content (window-content state))
+  ; workaround to avoid selecting the battery name
+  (set-content window #f)
+  (g-idle-add (lambda () (set-content window content) #f)))
+
+(define-traced (load app state get-info)
+  (with-exception-handler
+    (lambda (exception) (atomic-box-set! state exception))
+    (lambda () (atomic-box-set! state (or (get-info) 'no-battery)))
+    #:unwind? #t)
+  (g-idle-add (lambda () (update app state) #f)))
 
 (define app #f)
 
 (define-public (show-battery-info get-info)
+  (define state (make-atomic-box 'loading))
   (set! app (make <adw-application> #:application-id "com.her01n.Battery-Info"))
   (connect app 'activate
     (lambda (app)
-      (define info (with-exception-handler identity get-info #:unwind? #t))
-      (present-window app info)))
+      (present-window app)
+      ; delay displaying the spinner a little,
+      ; so it does not blink if the loading is fast
+      (g-timeout-add 200 (lambda () (update app state) #f))
+      (begin-thread (load app state get-info))))
   (begin-thread (run app '())))
 
 (define-public (close-battery-info)
@@ -166,7 +203,7 @@
     ('variant (g-variant->scm (g-variant-get-child-value variant 0)))
     ('array (list->vector (g-variant->list)))
     ('tuple (g-variant->list))))
-       
+
 (define timeout 1000)
 
 (define (get-property proxy name)

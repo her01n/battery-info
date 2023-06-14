@@ -1,4 +1,5 @@
-(use-modules (ice-9 match))
+(use-modules
+  (ice-9 match))
 
 (use-modules (g-golf))
 (gi-import "Adw")
@@ -7,11 +8,6 @@
 (use-modules (hdt hdt))
 
 (use-modules (battery info))
-
-(define (get-children component)
-  (define (siblings component)
-    (if component (cons component (siblings (get-next-sibling component))) (list)))
-  (siblings (get-first-child component)))
 
 (define (click component text)
   (cond
@@ -23,6 +19,14 @@
        (string-contains (get-label component) text)
        (begin (activate component) #t)))
     (else #f)))
+
+(define (find-child widget test)
+  (define (find widgets)
+    (format #t "(find ~a)\n" widgets)
+    (match widgets
+      ((widget . others) (or (and (test widget) widget) (find (get-children widget)) (find others)))
+      (else #f)))
+  (find (list widget)))
 
 (define (test-battery-info info)
   (hook (close-battery-info))
@@ -66,4 +70,14 @@
   (assert (string-contains copied-text "ACME"))
   (assert (string-contains copied-text "99 Wh")))
 
+(test spinner
+  (hook (close-battery-info))
+  (show-battery-info (lambda () (sleep 2) '((vendor . "ACME"))))
+  (sleep 1)
+  (define window (battery-info-window))
+  (assert window)
+  (assert (find-child window (lambda (widget) (is-a? widget <gtk-spinner>))))
+  (sleep 2)
+  (assert (not (find-child window (lambda (widget) (is-a? widget <gtk-spinner>)))))
+  (assert (string-contains (battery-info-text) "ACME")))
 
