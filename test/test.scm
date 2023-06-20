@@ -7,26 +7,7 @@
 
 (use-modules (hdt hdt))
 
-(use-modules (battery info))
-
-(define (click component text)
-  (cond
-    ((is-a? component <gtk-application>) (click (get-active-window component) text))
-    ((is-a? component <adw-application-window>) (click (get-content component) text))
-    ((is-a? component <gtk-box>) (find (lambda (child) (click child text)) (get-children component)))
-    ((is-a? component <gtk-window>) (click (get-child component) text))
-    ((is-a? component <gtk-button>)
-     (and
-       (string-contains (get-label component) text)
-       (begin (activate component) #t)))
-    (else #f)))
-
-(define (find-child widget test)
-  (define (find widgets)
-    (match widgets
-      ((widget . others) (or (and (test widget) widget) (find (get-children widget)) (find others)))
-      (else #f)))
-  (find (list widget)))
+(use-modules (battery info) (gtk))
 
 (define (test-battery-info info)
   (define get-info (if (procedure? info) info (lambda () info)))

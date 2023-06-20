@@ -24,7 +24,6 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- extract gtk stuff to another file
 - refactor layout, "Health" label is not necessary
 - maybe bigger font?
 - reload every second?

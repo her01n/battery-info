@@ -6,6 +6,8 @@
 
 (use-modules (g-golf))
 
+(use-modules (gtk))
+
 (g-irepository-require "Gtk" #:version "4.0")
 
 (gi-import-by-name "Gdk" "Clipboard")
@@ -55,23 +57,6 @@
   (define label (make <gtk-label> #:selectable #t))
   (set-markup label (format #f "~a <b>~a</b>" description value))
   label)
-
-(define-public (get-children component)
-  (define (siblings component)
-    (if component (cons component (siblings (get-next-sibling component))) (list)))
-  (siblings (get-first-child component)))
-
-(define-public (text component)
-  (cond
-    ((is-a? component <gtk-application>) (text (get-active-window component)))
-    ((is-a? component <adw-application-window>) (text (get-content component)))
-    ((is-a? component <adw-status-page>)
-     (format #f "~a ~a" (get-title component) (get-description component)))
-    ((is-a? component <adw-toast-overlay>) (text (get-child component)))
-    ((is-a? component <gtk-box>) (string-join (map text (get-children component)) "\n"))
-    ((is-a? component <gtk-window>) (text (get-child component)))
-    ((is-a? component <gtk-label>) (get-text component))
-    (else (format #f "~a" component))))
 
 (define (title info)
   (define vendor (or (assoc-ref info 'vendor) ""))
