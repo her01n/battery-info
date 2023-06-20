@@ -61,8 +61,9 @@
     (if component (cons component (siblings (get-next-sibling component))) (list)))
   (siblings (get-first-child component)))
 
-(define (text component)
+(define-public (text component)
   (cond
+    ((is-a? component <gtk-application>) (text (get-active-window component)))
     ((is-a? component <adw-application-window>) (text (get-content component)))
     ((is-a? component <adw-status-page>)
      (format #f "~a ~a" (get-title component) (get-description component)))
@@ -158,18 +159,16 @@
   (set-content window #f)
   (g-idle-add (lambda () (set-content window content) #f)))
 
-(define-traced (load app state get-info)
+(define (load app state get-info)
   (with-exception-handler
     (lambda (exception) (atomic-box-set! state exception))
     (lambda () (atomic-box-set! state (or (get-info) 'no-battery)))
     #:unwind? #t)
   (g-idle-add (lambda () (update app state) #f)))
 
-(define app #f)
-
-(define-public (show-battery-info get-info)
+(define-public (battery-info-app get-info)
   (define state (make-atomic-box 'loading))
-  (set! app (make <adw-application> #:application-id "com.her01n.Battery-Info"))
+  (define app (make <adw-application> #:application-id "com.her01n.Battery-Info"))
   (connect app 'activate
     (lambda (app)
       (present-window app)
@@ -177,16 +176,7 @@
       ; so it does not blink if the loading is fast
       (g-timeout-add 200 (lambda () (update app state) #f))
       (begin-thread (load app state get-info))))
-  (begin-thread (run app '())))
-
-(define-public (close-battery-info)
-  (and app (get-active-window app) (gtk-window-close (get-active-window app)))
-  (sleep 1))
-
-(define-public (battery-info-text)
-  (text (get-active-window app)))
-
-(define-public (battery-info-window) (get-active-window app))
+  app)
 
 (define (g-variant->scm variant)
   (define (g-variant->list)
@@ -240,6 +230,10 @@
             (capacity . ,(get-property proxy "Capacity")))))
       devices-names)))
 
-(define-public (main args)
-  (join-thread (show-battery-info get-battery-info)))
+(define* (run-battery-info #:optional (get-info get-battery-info) #:key (args '()))
+  (run (battery-info-app get-info) args))
+
+(export run-battery-info)
+
+(define-public (main args) (run-battery-info #:args args))
 

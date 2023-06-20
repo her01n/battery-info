@@ -24,13 +24,14 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- refactor to remove global app variable
 - extract gtk stuff to another file
+- refactor layout, "Health" label is not necessary
+- maybe bigger font?
 - reload every second?
 - create a web page
 - translate to slovak
 - deploy to flathub
-- post to /r/linux and hacker news
+- post to /r/linux? and hacker news and lemmy
 
 - gi-object-show does not work on Gio.BusType enum?
 - 

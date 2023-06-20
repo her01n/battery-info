@@ -23,5 +23,5 @@
 (add-to-load-path (dirname (current-filename)))
 (use-modules (battery info))
 
-(join-thread (show-battery-info test-get-info))
+(run-battery-info test-get-info)
 

@@ -1,5 +1,5 @@
 (use-modules
-  (ice-9 match))
+  (ice-9 match) (ice-9 threads))
 
 (use-modules (g-golf))
 (gi-import "Adw")
@@ -11,6 +11,7 @@
 
 (define (click component text)
   (cond
+    ((is-a? component <gtk-application>) (click (get-active-window component) text))
     ((is-a? component <adw-application-window>) (click (get-content component) text))
     ((is-a? component <gtk-box>) (find (lambda (child) (click child text)) (get-children component)))
     ((is-a? component <gtk-window>) (click (get-child component) text))
@@ -22,62 +23,65 @@
 
 (define (find-child widget test)
   (define (find widgets)
-    (format #t "(find ~a)\n" widgets)
     (match widgets
       ((widget . others) (or (and (test widget) widget) (find (get-children widget)) (find others)))
       (else #f)))
   (find (list widget)))
 
 (define (test-battery-info info)
-  (hook (close-battery-info))
-  (show-battery-info (lambda () info))
-  (sleep 1))
+  (define get-info (if (procedure? info) info (lambda () info)))
+  (define app (battery-info-app get-info))
+  (define thread (begin-thread (run app '())))
+  (hook
+    (define window (get-active-window app))
+    (if window (close window))
+    (join-thread thread))
+  (sleep 1)
+  app)
 
 (test no-battery
-  (test-battery-info #f)
-  (assert (string-contains (battery-info-text) "No battery")))
+  (define app (test-battery-info #f))
+  (assert (string-contains (text app) "No battery")))
 
 (test model
-  (test-battery-info
-    '((vendor . "ACME") (model . "VTX-3000") (energy-full-design . 99)))
-  (assert (string-contains (battery-info-text) "ACME"))
-  (assert (string-contains (battery-info-text) "VTX-3000"))
-  (assert (string-contains (battery-info-text) "99 Wh")))
+  (define app
+    (test-battery-info
+      '((vendor . "ACME") (model . "VTX-3000") (energy-full-design . 99))))
+  (assert (string-contains (text app) "ACME"))
+  (assert (string-contains (text app) "VTX-3000"))
+  (assert (string-contains (text app) "99 Wh")))
 
 (test technology
-  (test-battery-info '((technology . 2)))
-  (assert (string-contains (battery-info-text) "Li"))
-  (assert (string-contains (battery-info-text) "po")))
+  (define app (test-battery-info '((technology . 2))))
+  (assert (string-contains (text app) "Li"))
+  (assert (string-contains (text app) "po")))
 
 (test capacity
-  (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96)))
-  (assert (string-contains (battery-info-text) "48 Wh"))
-  (assert (string-contains (battery-info-text) "96%")))
+  (define app
+    (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96))))
+  (assert (string-contains (text app) "48 Wh"))
+  (assert (string-contains (text app) "96%")))
 
 (test error
-  (hook (close-battery-info))
-  (show-battery-info (lambda () (error "test error")))
+  (define app (test-battery-info (lambda () (error "test error"))))
   (sleep 1)
-  (assert (string-contains (battery-info-text) "Error")))
+  (assert (string-contains (text app) "Error")))
 
 (test copy
-  (test-battery-info '((vendor . "ACME") (energy-full-design . 99)))
-  (define window (battery-info-window))
-  (assert (click window "Copy to clipboard"))
+  (define app (test-battery-info '((vendor . "ACME") (energy-full-design . 99))))
+  (click app "Copy to clipboard")
   (sleep 1)
-  (define clipboard (get-clipboard (get-display window)))
+  (define clipboard (get-clipboard (get-display (get-active-window app))))
   (define copied-text (get-value (get-content clipboard)))
   (assert (string-contains copied-text "ACME"))
   (assert (string-contains copied-text "99 Wh")))
 
 (test spinner
-  (hook (close-battery-info))
-  (show-battery-info (lambda () (sleep 2) '((vendor . "ACME"))))
-  (sleep 1)
-  (define window (battery-info-window))
+  (define app (test-battery-info (lambda () (sleep 2) '((vendor . "ACME")))))
+  (define window (get-active-window app))
   (assert window)
   (assert (find-child window (lambda (widget) (is-a? widget <gtk-spinner>))))
   (sleep 2)
   (assert (not (find-child window (lambda (widget) (is-a? widget <gtk-spinner>)))))
-  (assert (string-contains (battery-info-text) "ACME")))
+  (assert (string-contains (text window) "ACME")))
 
