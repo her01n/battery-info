@@ -68,11 +68,6 @@
 (define (layout info)
   (vertical-box
     (h1 (title info) #:selectable #t)
-    (info-line "Nominal capacity"
-      (match (assoc-ref info 'energy-full-design)
-        ((and (? real?) (not 0.0) energy-full-design)
-         (format #f "~a Wh" energy-full-design))
-        (else "Unknown")))
     (info-line "Technology"
       (match (assoc-ref info 'technology)
         (1 "Lithium ion")
@@ -82,7 +77,11 @@
         (5 "Nickel cadmium")
         (6 "Nickel metal hydride")
         (else "Unknown")))
-    (h2 "Health")
+    (info-line "Nominal capacity"
+      (match (assoc-ref info 'energy-full-design)
+        ((and (? real?) (not 0.0) energy-full-design)
+         (format #f "~a Wh" energy-full-design))
+        (else "Unknown")))
     (info-line "Actual capacity"
       (match (assoc-ref info 'energy-full)
         ((and (? real?) (not 0.0) energy-full) (format #f "~a Wh" energy-full))
@@ -105,7 +104,7 @@
 
 (define (battery-info info)
   (define view (layout info))
-  (define copy-button (make <gtk-button> #:label "Copy to clipboard" #:margin-top 10 #:halign 'center))
+  (define copy-button (make <gtk-button> #:label "Copy to clipboard" #:margin-top 15 #:halign 'center))
   (define toast-overlay (make <adw-toast-overlay> #:child view))
   (define previous-toast #f)
   (connect copy-button 'clicked
