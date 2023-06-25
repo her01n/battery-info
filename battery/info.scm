@@ -28,13 +28,9 @@
   (for-each (lambda (child) (append box child)) children)
   box)
 
-(define (hx class margin)
-  (lambda* (title #:key selectable)
-    (make <gtk-label> #:selectable selectable #:label title #:css-classes (list class)
-      #:margin-top margin #:margin-bottom margin)))
-
-(define h1 (hx "title-1" 5))
-(define h2 (hx "title-2" 5))
+(define* (h1 title #:key selectable)
+  (make <gtk-label> #:css-classes (list "title-1") #:margin-bottom 5
+    #:label title #:selectable selectable))
 
 (define (loading)
   (define spinner (make <gtk-spinner> #:margin-top 40 #:margin-bottom 40
