@@ -66,3 +66,7 @@
   (assert (not (find-child window (lambda (widget) (is-a? widget <gtk-spinner>)))))
   (assert (string-contains (text window) "ACME")))
 
+(test rounding
+  (define app (test-battery-info '((energy-full-design . 56.160000000000004))))
+  (assert (string-contains (text app) "56.16 Wh")))
+

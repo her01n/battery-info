@@ -61,6 +61,12 @@
     (format #f "~a ~a" vendor model)
     "Unknown Battery"))
 
+(define (capacity->string value)
+  (match value
+    ((and (? real?) (not 0.0))
+     (format #f "~a Wh" (/ (round (* value 100)) 100)))
+    (else "Unknown")))
+
 (define (layout info)
   (vertical-box
     (h1 (title info) #:selectable #t)
@@ -74,14 +80,9 @@
         (6 "Nickel metal hydride")
         (else "Unknown")))
     (info-line "Nominal capacity"
-      (match (assoc-ref info 'energy-full-design)
-        ((and (? real?) (not 0.0) energy-full-design)
-         (format #f "~a Wh" energy-full-design))
-        (else "Unknown")))
+      (capacity->string (assoc-ref info 'energy-full-design)))
     (info-line "Actual capacity"
-      (match (assoc-ref info 'energy-full)
-        ((and (? real?) (not 0.0) energy-full) (format #f "~a Wh" energy-full))
-        (else "Unknown")))
+      (capacity->string (assoc-ref info 'energy-full)))
     (info-line "Capacity percentage"
       (match (assoc-ref info 'capacity)
         ((and (? real?) (not 0.0) capacity) (format #f "~a%" (round capacity)))
