@@ -1,10 +1,12 @@
 ## Requirements
 
-- guile 3
-- guile-lib
+- guile 3.0
+- guile-lib 0.2.5
   from http://download.savannah.nongnu.org/releases/guile-lib/
-- g-golf
+- g-golf 0.8
   from git://git.savannah.gnu.org/g-golf.git
+- gtk 4
+- libadwaita 1.3
 
 ## Description
 
@@ -14,7 +16,7 @@ Information is collected using UPower DBus interface
 with the *gdbus* client from *Gio* library.
 User interface is displayed using *Adw* and *Gtk* libraries.
 
-I would like to number of cells, or nominal voltage to battery information.
+I would like to display number of cells, or nominal voltage to battery information.
 This is not provided by UPower interface.
 It may be guessed by the technology, voltage and state values.
   
@@ -24,8 +26,12 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- reload every second?
-- create a web page
+- add computer vendor and model
+- refactor layout?
+  remove header bar, use 'battery-info' as heading,
+  display battery vendor and model as a line
+- refactor testing to remove sleeps
+- add signature
 - translate to slovak
 - deploy to flathub
 - post to /r/linux? and hacker news and lemmy

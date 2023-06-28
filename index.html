@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Battery Info</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">  
+  </head>
+  <body>
+    <main>
+      <h1>Battery Info</h1>
+      <p>
+        Battery Info is a desktop application
+        to display health information about the notebook battery.
+      </p>
+      <h2>Screenshots</h2>
+      <img src="screenshots/taran-light.png" />
+      <img src="screenshots/rainbow-dark.png" />
+      <h2>Description</h2>
+      Application displays current battery health
+      as well as some general information about the battery.
+      <ul>
+        <li>
+          <strong>Vendor and Model</strong>
+          Battery vendor and model number.
+          This information can be used to source the battery replacement.
+        </li>
+        <li>
+          <strong>Technology</strong>
+          Battery chemistry.
+          Lithium ion is the common proven technology.
+          Lithium polymer allows for thiner batteries.
+        </li>
+        <li>
+          <strong>Nominal capacity</strong>
+          Energy amount the battery can hold by design.
+        </li>
+        <li>
+          <strong>Actual capacity</strong>
+          Actual energy amount the battery can hold as measured by the operating system.
+          To get the most accurate value, fully charge and fully discharge the battery.
+        </li>
+        <li>
+          <strong>Capacity percentage</strong>
+          The ratio between the actual and nominal capacity.
+          Typical values are 90-100% for batteries in good shape.
+          For values below 75% it is recommended to replace the battery.
+        </li>
+      </ul>
+      <h2>Build and Install</h2>
+      <p>
+        First install the requirements.
+        <ul>
+          <li><a href="https://www.gnu.org/software/guile/">guile 3.0</a></li>
+          <li><a href="https://www.nongnu.org/guile-lib/">guile-lib 0.2.5</a></li>
+          <li><a href="https://www.gnu.org/software/g-golf/">g-golf 0.8</a></li>
+          <li><a href="https://www.gtk.org/">gtk 4</a></li>
+          <li><a href="https://gnome.pages.gitlab.gnome.org/libadwaita/">libadwaita 1.3</a></li>
+        </ul>
+      </p>
+      <p>
+        Checkout the source code from <a href="https://github.com/her01n/battery-info">github</a>.
+<pre><code>$ git clone https://github.com/her01n/battery-info
+</pre></code>
+      </p>
+      <p>
+        You can now run the application locally or install it.
+<pre><code>$ ./battery-info
+$ sudo make install
+</code></pre>
+      </p>
+      <p>
+        For unit testing, first install <a href="https://github.com/her01n/hdt">hdt</a> test library.
+        Then run <code>hdt</code> or alternatively <code>make</code> in the source directory.
+      </p>
+      <p>
+        This is a guile program using <em>g-golf</em> library
+        to access <em>Gio</em>, <em>Gtk</em> and <em>Adwaita</em> libraries.
+        Information is collected using <a href="https://upower.freedesktop.org/docs/Device.html">UPower</a>
+        DBus interface, with the <em>gdbus</em> client from <em>Gio</em> library.
+        User interface is displayed using <em>Adwaita</em> and <em>Gtk</em> libraries.
+      </p>
+    </main>
+    <footer>
+      <p>
+        Battery Info is made by Michal Herko
+      </p>
+      <p>
+        <a href="mailto://michal@herko.it">michal@herko.it</a>
+      </p>
+    </footer>
+  </body>
+</html>
