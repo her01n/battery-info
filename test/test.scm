@@ -70,3 +70,7 @@
   (define app (test-battery-info '((energy-full-design . 56.160000000000004))))
   (assert (string-contains (text app) "56.16 Wh")))
 
+(test computer-vendor-model
+  (define app (test-battery-info '((sys-vendor . "ACME") (sys-model . "ASDF-1"))))
+  (assert (string-contains (text app) "ACME ASDF-1")))
+

@@ -1,7 +1,8 @@
 (define-module (battery info))
 
 (use-modules
-  (ice-9 atomic) (ice-9 exceptions) (ice-9 threads)
+  (ice-9 atomic) (ice-9 exceptions) (ice-9 match)
+  (ice-9 textual-ports) (ice-9 threads)
   (sxml simple) (sxml xpath))
 
 (use-modules (g-golf))
@@ -54,12 +55,10 @@
   (set-markup label (format #f "~a <b>~a</b>" description value))
   label)
 
-(define (title info)
-  (define vendor (or (assoc-ref info 'vendor) ""))
-  (define model (or (assoc-ref info 'model) ""))
-  (if (or (not (equal? "" vendor)) (not (equal? "" model)))
-    (format #f "~a ~a" vendor model)
-    "Unknown Battery"))
+(define (join null a b)
+  (define s
+    (filter (lambda (value) (and value (not (equal? "" value)))) (list a b)))
+  (if (null? s) null (string-join s)))
 
 (define (capacity->string value)
   (match value
@@ -69,7 +68,9 @@
 
 (define (layout info)
   (vertical-box
-    (h1 (title info) #:selectable #t)
+    (h1 (join "Unknown Battery" (assoc-ref info 'vendor) (assoc-ref info 'model)))
+    (info-line "System"
+      (join "Unknown" (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
     (info-line "Technology"
       (match (assoc-ref info 'technology)
         (1 "Lithium ion")
@@ -185,7 +186,7 @@
         (g-variant-parse #f (format #f "(\"~a\", \"~a\")" "org.freedesktop.UPower.Device" name) #f #f)
         '() timeout #f))))
 
-(define-public (get-battery-info)
+(define-public (get-upower-info)
   ; list objects of system org.freedesktop.UPower service
   (define upower-proxy
     (gd-bus-proxy-new-for-bus-sync
@@ -210,6 +211,31 @@
             (energy-full . ,(get-property proxy "EnergyFull"))
             (capacity . ,(get-property proxy "Capacity")))))
       devices-names)))
+
+(define (read-dmi key)
+  (define string
+    (call-with-input-file
+      (string-append "/sys/devices/virtual/dmi/id/" key)
+      (@ (ice-9 textual-ports) get-line)))
+  (match string
+    ("" #f)
+    ("Default String" #f)
+    ("To Be Filled By O.E.M." #f)
+    (value value)))
+
+(define (get-dmi-info)
+  (with-exception-handler
+    (lambda (exception)
+      (format #t "Failed to get dmi info: ~a\n" (exception-message exception))
+      '())
+    (lambda ()
+      `((sys-vendor . ,(read-dmi "sys_vendor"))
+        (sys-model . ,(read-dmi "product_name"))))
+    #:unwind? #t))
+
+(define (get-battery-info)
+  (define upower (get-upower-info))
+  (and (list? upower) (append upower (get-dmi-info))))
 
 (define* (run-battery-info #:optional (get-info get-battery-info) #:key (args '()))
   (run (battery-info-app get-info) args))
