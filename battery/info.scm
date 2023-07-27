@@ -68,7 +68,9 @@
 
 (define (layout info)
   (vertical-box
-    (h1 (join "Unknown Battery" (assoc-ref info 'vendor) (assoc-ref info 'model)))
+    (h1
+      (join "Unknown Battery" (assoc-ref info 'vendor) (assoc-ref info 'model))
+      #:selectable #t)
     (info-line "System"
       (join "Unknown" (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
     (info-line "Technology"

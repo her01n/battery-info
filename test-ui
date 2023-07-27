@@ -11,6 +11,8 @@
      (delayed
        '((vendor . "ACME")
          (model . "B1")
+         (sys-vendor . "Compaq")
+         (sys-model . "Portable")
          (energy-full-design . 99)
          (technology . 2)
          (energy-full . 90)

@@ -45,7 +45,6 @@
 
 (test error
   (define app (test-battery-info (lambda () (error "test error"))))
-  (sleep 1)
   (assert (string-contains (text app) "Error")))
 
 (test copy

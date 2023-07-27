@@ -26,12 +26,9 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- refactor layout?
-  remove header bar, use 'Battery Info' as heading,
-  display battery vendor and model as a line
-- refactor testing to remove sleeps
-- add signature
+- add signature to ui, "Made by Michal Herko"
 - translate to slovak
+- paint my own icon
 - deploy to flathub
   - update screenshots
 - post to /r/linux? and hacker news and lemmy
