@@ -111,7 +111,8 @@
 
 (define (battery-info info)
   (define view (layout info))
-  (define copy-button (make <gtk-button> #:label "Copy to clipboard" #:margin-top 15 #:halign 'center))
+  (define copy-button
+    (make <gtk-button> #:label "Copy" #:margin-top 15 #:halign 'center))
   (define toast-overlay (make <adw-toast-overlay> #:child view))
   (define previous-toast #f)
   (connect copy-button 'clicked

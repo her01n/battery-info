@@ -49,7 +49,7 @@
 
 (test copy
   (define app (test-battery-info '((vendor . "ACME") (energy-full-design . 99))))
-  (click app "Copy to clipboard")
+  (click app "Copy")
   (sleep 1)
   (define clipboard (get-clipboard (get-display (get-active-window app))))
   (define copied-text (get-value (get-content clipboard)))
