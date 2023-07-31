@@ -26,12 +26,15 @@ For the icon i have used art from Adrien Coquet and Kidiladon.
 
 ## TODO
 
-- add signature to ui, "Made by Michal Herko"
+- rename "copy to clipboard" to "copy" only
 - translate to slovak
 - paint my own icon
+- use toolbar view?
+- content should have a scroll bar
 - deploy to flathub
   - update screenshots
 - post to /r/linux? and hacker news and lemmy
+- describe "system" in web page
 
 - gi-object-show does not work on Gio.BusType enum?
 - 

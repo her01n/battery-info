@@ -55,6 +55,13 @@
   (set-markup label (format #f "~a <b>~a</b>" description value))
   label)
 
+(define (vertical-glue) (make <gtk-label> #:valign 'fill #:vexpand #t))
+
+(define (meta-line text)
+  (define label (make <gtk-label>))
+  (set-markup label (format #f "<i>~a</i>" text))
+  label)
+
 (define (join null a b)
   (define s
     (filter (lambda (value) (and value (not (equal? "" value)))) (list a b)))
@@ -128,6 +135,8 @@
     (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
       #:margin-left 10 #:margin-right 10))
   (append bordered content)
+  (append bordered (vertical-glue))
+  (append bordered (meta-line "Made by Michal Herko"))
   (vertical-box (make <adw-header-bar>) bordered))
 
 (define (present-window app)
