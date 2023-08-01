@@ -1,0 +1,65 @@
+#
+# Michal Herko <michal@herko.it>, 2023.
+#
+msgid ""
+msgstr ""
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: battery/info.scm:40
+msgid "Loading"
+msgstr "Načítava sa"
+
+#: battery/info.scm:45
+msgid "No battery detected."
+msgstr "Nenašla sa žiadna batéria."
+
+#: battery/info.scm:50
+msgid "Error reading battery info."
+msgstr "Chyba pri zisťovaní informácií o batérii."
+
+#: battery/info.scm:74 battery/info.scm:82 battery/info.scm:100
+msgid "Unknown"
+msgstr "Neznáme"
+
+#: battery/info.scm:79
+msgid "Unknown Battery"
+msgstr "Neznáma batéria"
+
+#: battery/info.scm:81
+msgid "System"
+msgstr "Systém"
+
+#: battery/info.scm:83
+msgid "Technology"
+msgstr "Technológia"
+
+#: battery/info.scm:93
+msgid "Nominal capacity"
+msgstr "Nominálna kapacita"
+
+#: battery/info.scm:95
+msgid "Actual capacity"
+msgstr "Skutočná kapacita"
+
+#: battery/info.scm:97
+msgid "Capacity percentage"
+msgstr "Pomer kapacity"
+
+#: battery/info.scm:116
+msgid "Copy"
+msgstr "Kopírovať"
+
+#: battery/info.scm:123
+msgid "Info copied to clipboard."
+msgstr "Info skopírované do schránky."
+
+#: battery/info.scm:141
+msgid "Made by Michal Herko"
+msgstr "Vyrobil Michal Herko"
+
+#: battery/info.scm:146
+msgid "Battery Info"
+msgstr "Info o batérii"

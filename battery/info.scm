@@ -24,6 +24,9 @@
 (gi-import-by-name "Adw" "StatusPage")
 (gi-import-by-name "Adw" "ToastOverlay")
 
+(bindtextdomain "battery-info" "locale")
+(textdomain "battery-info")
+
 (define (vertical-box . children)
   (define box (make <gtk-box> #:orientation 'vertical))
   (for-each (lambda (child) (append box child)) children)
@@ -37,17 +40,17 @@
   (define spinner (make <gtk-spinner> #:margin-top 40 #:margin-bottom 40
     #:width-request 40 #:height-request 40))
   (start spinner)
-  (vertical-box spinner (h1 "Loading")))
+  (vertical-box spinner (h1 (gettext "Loading"))))
 
 (define (no-battery)
   (make <adw-status-page>
     #:icon-name "system-search-symbolic"
-    #:title "No battery detected."))
+    #:title (gettext "No battery detected.")))
 
 (define (info-error exception)
   (make <adw-status-page>
     #:icon-name "dialog-error-symbolic"
-    #:title "Error reading battery info"
+    #:title (gettext "Error reading battery info.")
     #:description (exception-message exception)))
 
 (define (info-line description value)
@@ -71,32 +74,32 @@
   (match value
     ((and (? real?) (not 0.0))
      (format #f "~a Wh" (/ (round (* value 100)) 100)))
-    (else "Unknown")))
+    (else (gettext "Unknown"))))
 
 (define (layout info)
   (vertical-box
     (h1
-      (join "Unknown Battery" (assoc-ref info 'vendor) (assoc-ref info 'model))
+      (join (gettext "Unknown Battery") (assoc-ref info 'vendor) (assoc-ref info 'model))
       #:selectable #t)
-    (info-line "System"
-      (join "Unknown" (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
-    (info-line "Technology"
+    (info-line (gettext "System")
+      (join (gettext "Unknown") (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
+    (info-line (gettext "Technology")
       (match (assoc-ref info 'technology)
-        (1 "Lithium ion")
-        (2 "Lithium polymer")
-        (3 "Lithium iron phosphate")
-        (4 "Lead acid")
-        (5 "Nickel cadmium")
-        (6 "Nickel metal hydride")
-        (else "Unknown")))
-    (info-line "Nominal capacity"
+        (1 (gettext "Lithium ion"))
+        (2 (gettext "Lithium polymer"))
+        (3 (gettext "Lithium iron phosphate"))
+        (4 (gettext "Lead acid"))
+        (5 (gettext "Nickel cadmium"))
+        (6 (gettext "Nickel metal hydride"))
+        (else (gettext "Unknown"))))
+    (info-line (gettext "Nominal capacity")
       (capacity->string (assoc-ref info 'energy-full-design)))
-    (info-line "Actual capacity"
+    (info-line (gettext "Actual capacity")
       (capacity->string (assoc-ref info 'energy-full)))
-    (info-line "Capacity percentage"
+    (info-line (gettext "Capacity percentage")
       (match (assoc-ref info 'capacity)
         ((and (? real?) (not 0.0) capacity) (format #f "~a%" (round capacity)))
-        (else "Unknown")))))
+        (else (gettext "Unknown"))))))
 
 (define (copy-to-clipboard text)
   (define clipboard (get-clipboard (gdk-display-get-default)))
@@ -112,14 +115,14 @@
 (define (battery-info info)
   (define view (layout info))
   (define copy-button
-    (make <gtk-button> #:label "Copy" #:margin-top 15 #:halign 'center))
+    (make <gtk-button> #:label (gettext "Copy") #:margin-top 15 #:halign 'center))
   (define toast-overlay (make <adw-toast-overlay> #:child view))
   (define previous-toast #f)
   (connect copy-button 'clicked
     (lambda (b)
       (copy-to-clipboard (text view))
       (if previous-toast (dismiss previous-toast))
-      (let ((toast (make <adw-toast> #:title "Info copied to clipboard.")))
+      (let ((toast (make <adw-toast> #:title (gettext "Info copied to clipboard."))))
         (add-toast toast-overlay toast)
         (if previous-toast (unref previous-toast))
         (set! previous-toast (ref toast)))))
@@ -137,12 +140,12 @@
       #:margin-left 10 #:margin-right 10))
   (append bordered content)
   (append bordered (vertical-glue))
-  (append bordered (meta-line "Made by Michal Herko"))
+  (append bordered (meta-line (gettext "Made by Michal Herko")))
   (vertical-box (make <adw-header-bar>) bordered))
 
 (define (present-window app)
   (define window
-    (make <adw-application-window> #:application app #:title "Battery Info"))
+    (make <adw-application-window> #:application app #:title (gettext "Battery Info")))
   (set-default-size window 400 400)
   (present window))
 
