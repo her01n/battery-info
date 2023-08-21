@@ -12,6 +12,9 @@ battery-info.pot:
 
 LANGUAGES = $(patsubst ./po/%.po,%,$(wildcard ./po/*.po))
 
+update-translations: battery-info.pot
+	$(foreach language,$(LANGUAGES),msgmerge --update po/$(language).po battery-info.pot)
+
 locale/%/LC_MESSAGES/battery-info.mo: po/%.po
 	mkdir -p $(shell dirname $@)
 	msgfmt $^ -o $@

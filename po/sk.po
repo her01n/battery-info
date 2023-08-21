@@ -3,63 +3,65 @@
 #
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-01 08:33+0200\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: battery/info.scm:40
+#: battery/info.scm:42
 msgid "Loading"
 msgstr "Načítava sa"
 
-#: battery/info.scm:45
+#: battery/info.scm:47
 msgid "No battery detected."
 msgstr "Nenašla sa žiadna batéria."
 
-#: battery/info.scm:50
+#: battery/info.scm:52
 msgid "Error reading battery info."
 msgstr "Chyba pri zisťovaní informácií o batérii."
 
-#: battery/info.scm:74 battery/info.scm:82 battery/info.scm:100
+#: battery/info.scm:76 battery/info.scm:84 battery/info.scm:102
 msgid "Unknown"
 msgstr "Neznáme"
 
-#: battery/info.scm:79
+#: battery/info.scm:81
 msgid "Unknown Battery"
 msgstr "Neznáma batéria"
 
-#: battery/info.scm:81
+#: battery/info.scm:83
 msgid "System"
 msgstr "Systém"
 
-#: battery/info.scm:83
+#: battery/info.scm:85
 msgid "Technology"
 msgstr "Technológia"
 
-#: battery/info.scm:93
+#: battery/info.scm:95
 msgid "Nominal capacity"
 msgstr "Nominálna kapacita"
 
-#: battery/info.scm:95
+#: battery/info.scm:97
 msgid "Actual capacity"
 msgstr "Skutočná kapacita"
 
-#: battery/info.scm:97
+#: battery/info.scm:99
 msgid "Capacity percentage"
 msgstr "Pomer kapacity"
 
-#: battery/info.scm:116
+#: battery/info.scm:118
 msgid "Copy"
 msgstr "Kopírovať"
 
-#: battery/info.scm:123
+#: battery/info.scm:125
 msgid "Info copied to clipboard."
 msgstr "Info skopírované do schránky."
 
-#: battery/info.scm:141
+#: battery/info.scm:143
 msgid "Made by Michal Herko"
 msgstr "Vyrobil Michal Herko"
 
-#: battery/info.scm:146
+#: battery/info.scm:148
 msgid "Battery Info"
 msgstr "Info o batérii"
