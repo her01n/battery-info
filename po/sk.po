@@ -4,39 +4,64 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-01 08:33+0200\n"
+"POT-Creation-Date: 2023-08-21 16:26+0200\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: battery/info.scm:42
+#: battery/info.scm:43
 msgid "Loading"
 msgstr "Načítava sa"
 
-#: battery/info.scm:47
+#: battery/info.scm:48
 msgid "No battery detected."
 msgstr "Nenašla sa žiadna batéria."
 
-#: battery/info.scm:52
+#: battery/info.scm:53
 msgid "Error reading battery info."
 msgstr "Chyba pri zisťovaní informácií o batérii."
 
-#: battery/info.scm:76 battery/info.scm:84 battery/info.scm:102
+#: battery/info.scm:77 battery/info.scm:85 battery/info.scm:94
+#: battery/info.scm:102
 msgid "Unknown"
 msgstr "Neznáme"
 
-#: battery/info.scm:81
+#: battery/info.scm:82
 msgid "Unknown Battery"
 msgstr "Neznáma batéria"
 
-#: battery/info.scm:83
+#: battery/info.scm:84
 msgid "System"
 msgstr "Systém"
 
-#: battery/info.scm:85
+#: battery/info.scm:86
 msgid "Technology"
 msgstr "Technológia"
+
+#: battery/info.scm:88
+msgid "Lithium ion"
+msgstr "lítium-iónová"
+
+#: battery/info.scm:89
+msgid "Lithium polymer"
+msgstr "lítium-polymérová"
+
+#: battery/info.scm:90
+msgid "Lithium iron phosphate"
+msgstr "lítium-železo-fosfátová"
+
+#: battery/info.scm:91
+msgid "Lead acid"
+msgstr "olovená"
+
+#: battery/info.scm:92
+msgid "Nickel cadmium"
+msgstr "nikel-kadmiová"
+
+#: battery/info.scm:93
+msgid "Nickel metal hydride"
+msgstr "nikel-metalhydridová"
 
 #: battery/info.scm:95
 msgid "Nominal capacity"
@@ -60,7 +85,7 @@ msgstr "Info skopírované do schránky."
 
 #: battery/info.scm:143
 msgid "Made by Michal Herko"
-msgstr "Vyrobil Michal Herko"
+msgstr "Aplikáciu vyrobil Michal Herko"
 
 #: battery/info.scm:148
 msgid "Battery Info"
