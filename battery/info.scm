@@ -165,7 +165,7 @@
 
 (define-public (battery-info-app get-info)
   (define state (make-atomic-box 'loading))
-  (define app (make <adw-application> #:application-id "com.her01n.Battery-Info"))
+  (define app (make <adw-application> #:application-id "com.her01n.BatteryInfo"))
   (connect app 'activate
     (lambda (app)
       (present-window app)

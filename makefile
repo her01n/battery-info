@@ -30,9 +30,10 @@ install-mos:
 install: install-mos
 	install --directory $(SITE)/battery
 	sed s!"locale"!"$(PREFIX)/share/locale"! <battery/info.scm >$(SITE)/battery/info.scm
+	install -D -t $(SITE) gtk.scm
 	install -D -t $(PREFIX)/bin battery-info
 	install -D -t $(PREFIX)/share/icons/hicolor/scalable/apps/ com.her01n.BatteryInfo.svg
-	install -D -t $(PREFIX)/share/applications battery-info.desktop
+	install -D -t $(PREFIX)/share/applications com.her01n.BatteryInfo.desktop
 
 deploy:
 	rsync --update --archive --delete \

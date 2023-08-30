@@ -20,21 +20,15 @@ I would like to display number of cells, or nominal voltage to battery informati
 This is not provided by UPower interface.
 It may be guessed by the technology, voltage and state values.
   
-## Icon attribution
-
-For the icon i have used art from Adrien Coquet and Kidiladon.
-
 ## TODO
 
-- translate to slovak
-  - translate battery technologies
-- paint my own icon
 - use toolbar view?
+- use properties instead of the key, value labels layout
 - content should have a scroll bar
 - deploy to flathub
   - update screenshots
+  - describe "system" on web page
 - post to /r/linux? and hacker news and lemmy
-- describe "system" on web page
 
 - gi-object-show does not work on Gio.BusType enum?
 - 
