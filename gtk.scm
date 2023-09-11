@@ -42,3 +42,17 @@
     (click (get-active-window widget) text)
     (activate (find-child widget should-click))))
 
+(define-public (gtk-main)
+  (when (< 0 (get-n-items (gtk-window-get-toplevels)))
+    (g-main-context-iteration #nil #t)
+    (gtk-main)))
+
+(define-public (gtk-timed-loop time)
+  (define timed-out #f)
+  (define (loop)
+    (when (not timed-out)
+      (g-main-context-iteration #nil #t)
+      (loop)))
+  (g-timeout-add (* time 1000) (lambda () (set! timed-out #t) #f))
+  (loop))
+

@@ -9,67 +9,62 @@
 
 (use-modules (battery info) (gtk))
 
-(define (test-battery-info info)
-  (define get-info (if (procedure? info) info (lambda () info)))
-  (define app (battery-info-app get-info))
-  (define thread (begin-thread (run app '())))
-  (hook
-    (define window (get-active-window app))
-    (if window (close window))
-    (join-thread thread))
-  (sleep 1)
-  app)
+(define (test-battery-info get-info)
+  (define window (show-battery-info get-info))
+  (hook (close window))
+  (gtk-timed-loop 1)
+  window)
 
 (test no-battery
-  (define app (test-battery-info #f))
-  (assert (string-contains (text app) "No battery")))
+  (define window (test-battery-info #f))
+  (assert (string-contains (text window) "No battery")))
 
 (test model
-  (define app
+  (define window
     (test-battery-info
       '((vendor . "ACME") (model . "VTX-3000") (energy-full-design . 99))))
-  (assert (string-contains (text app) "ACME"))
-  (assert (string-contains (text app) "VTX-3000"))
-  (assert (string-contains (text app) "99 Wh")))
+  (assert (string-contains (text window) "ACME"))
+  (assert (string-contains (text window) "VTX-3000"))
+  (assert (string-contains (text window) "99 Wh")))
 
 (test technology
-  (define app (test-battery-info '((technology . 2))))
-  (assert (string-contains (text app) "Li"))
-  (assert (string-contains (text app) "po")))
+  (define window (test-battery-info '((technology . 2))))
+  (assert (string-contains (text window) "Li"))
+  (assert (string-contains (text window) "po")))
 
 (test capacity
-  (define app
+  (define window
     (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96))))
-  (assert (string-contains (text app) "48 Wh"))
-  (assert (string-contains (text app) "96%")))
+  (assert (string-contains (text window) "48 Wh"))
+  (assert (string-contains (text window) "96%")))
 
 (test error
-  (define app (test-battery-info (lambda () (error "test error"))))
-  (assert (string-contains (text app) "Error")))
+  (define window (test-battery-info (lambda () (error "test error"))))
+  (assert (string-contains (text window) "Error")))
 
 (test copy
-  (define app (test-battery-info '((vendor . "ACME") (energy-full-design . 99))))
-  (click app "Copy")
-  (sleep 1)
-  (define clipboard (get-clipboard (get-display (get-active-window app))))
+  (define window (test-battery-info '((vendor . "ACME") (energy-full-design . 99))))
+  (click window "Copy")
+  (gtk-timed-loop 1)
+  (define clipboard (get-clipboard (get-display window)))
   (define copied-text (get-value (get-content clipboard)))
   (assert (string-contains copied-text "ACME"))
   (assert (string-contains copied-text "99 Wh")))
 
 (test spinner
-  (define app (test-battery-info (lambda () (sleep 2) '((vendor . "ACME")))))
-  (define window (get-active-window app))
+  (define window (test-battery-info (lambda () (sleep 2) '((vendor . "ACME")))))
   (assert window)
   (assert (find-child window (lambda (widget) (is-a? widget <gtk-spinner>))))
-  (sleep 2)
+  (gtk-timed-loop 2)
   (assert (not (find-child window (lambda (widget) (is-a? widget <gtk-spinner>)))))
   (assert (string-contains (text window) "ACME")))
 
 (test rounding
-  (define app (test-battery-info '((energy-full-design . 56.160000000000004))))
-  (assert (string-contains (text app) "56.16 Wh")))
+  (define window (test-battery-info '((energy-full-design . 56.160000000000004))))
+  (assert (string-contains (text window) "56.16 Wh")))
 
 (test computer-vendor-model
-  (define app (test-battery-info '((sys-vendor . "ACME") (sys-model . "ASDF-1"))))
-  (assert (string-contains (text app) "ACME ASDF-1")))
+  (define window
+    (test-battery-info '((sys-vendor . "ACME") (sys-model . "ASDF-1"))))
+  (assert (string-contains (text window) "ACME ASDF-1")))
 

@@ -23,7 +23,7 @@
     (else (error "Please specify test from: good-battery no-battery error loading"))))
 
 (add-to-load-path (dirname (current-filename)))
-(use-modules (battery info))
+(use-modules (battery info) (gtk))
 
-(run-battery-info test-get-info)
-
+(show-battery-info test-get-info)
+(gtk-main)

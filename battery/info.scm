@@ -13,10 +13,12 @@
 
 (gi-import-by-name "Gdk" "Clipboard")
 (gi-import-by-name "Gdk" "Display")
+(gi-import-by-name "Gio" "Application")
 (gi-import-by-name "Gio" "DBusProxy")
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Button")
 (gi-import-by-name "Gtk" "Label")
+(gi-import-by-name "Gtk" "ScrolledWindow")
 (gi-import-by-name "Gtk" "Spinner")
 (gi-import-by-name "Adw" "HeaderBar")
 (gi-import-by-name "Adw" "Application")
@@ -143,37 +145,42 @@
   (append bordered (meta-line (gettext "Made by Michal Herko")))
   (vertical-box (make <adw-header-bar>) bordered))
 
-(define (present-window app)
-  (define window
-    (make <adw-application-window> #:application app #:title (gettext "Battery Info")))
-  (set-default-size window 400 400)
-  (present window))
+(define-public battery-info-app
+  (make <adw-application> #:application-id "com.her01n.BatteryInfo"))
 
-(define (update app state)
-  (define window (get-active-window app))
+(register battery-info-app #f)
+
+(define (present-window)
+  (define window
+    (make <adw-application-window> #:application battery-info-app
+      #:title (gettext "Battery Info")))
+  (set-default-size window 400 400)
+  (present window)
+  window)
+
+(define (update window state)
   (define content (window-content state))
   ; workaround to avoid selecting the battery name
   (set-content window #f)
   (g-idle-add (lambda () (set-content window content) #f)))
 
-(define (load app state get-info)
+(define (load window state get-info)
+  (define get-info-proc
+    (if (procedure? get-info) get-info (lambda () get-info)))
   (with-exception-handler
     (lambda (exception) (atomic-box-set! state exception))
-    (lambda () (atomic-box-set! state (or (get-info) 'no-battery)))
+    (lambda () (atomic-box-set! state (or (get-info-proc) 'no-battery)))
     #:unwind? #t)
-  (g-idle-add (lambda () (update app state) #f)))
+  (g-idle-add (lambda () (update window state) #f)))
 
-(define-public (battery-info-app get-info)
+(define-public (show-battery-info get-info)
   (define state (make-atomic-box 'loading))
-  (define app (make <adw-application> #:application-id "com.her01n.BatteryInfo"))
-  (connect app 'activate
-    (lambda (app)
-      (present-window app)
-      ; delay displaying the spinner a little,
-      ; so it does not blink if the loading is fast
-      (g-timeout-add 200 (lambda () (update app state) #f))
-      (begin-thread (load app state get-info))))
-  app)
+  (define window (present-window))
+  ; delay displaying the spinner a little,
+  ; so it does not blink if the loading is fast
+  (g-timeout-add 200 (lambda () (update window state) #f))
+  (begin-thread (load window state get-info))
+  window)
 
 (define (g-variant->scm variant)
   (define (g-variant->list)
@@ -252,10 +259,9 @@
   (define upower (get-upower-info))
   (and (list? upower) (append upower (get-dmi-info))))
 
-(define* (run-battery-info #:optional (get-info get-battery-info) #:key (args '()))
-  (run (battery-info-app get-info) args))
-
-(export run-battery-info)
-
-(define-public (main args) (run-battery-info #:args args))
+(define-public (main args)
+  (connect battery-info-app 'activate
+    (lambda (app)
+      (show-battery-info get-info)))
+  (run battery-info-app args))
 
