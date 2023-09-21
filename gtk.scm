@@ -8,6 +8,7 @@
 (gi-import-by-name "Gtk" "Application")
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Label")
+(gi-import-by-name "Gtk" "ScrolledWindow")
 (gi-import-by-name "Gtk" "Window")
 
 (define-public (children widget)
@@ -25,6 +26,8 @@
     ((is-a? widget <gtk-box>) (string-join (map text (children widget)) "\n"))
     ((is-a? widget <gtk-window>) (text (get-child widget)))
     ((is-a? widget <gtk-label>) (get-text widget))
+    ((is-a? widget <gtk-scrolled-window>) (text (get-child widget)))
+    ((is-a? widget <gtk-viewport>) (text (get-child widget)))
     (else (format #f "~a" widget))))
 
 (define-public (find-child widget test)
@@ -43,16 +46,14 @@
     (activate (find-child widget should-click))))
 
 (define-public (gtk-main)
-  (when (< 0 (get-n-items (gtk-window-get-toplevels)))
-    (g-main-context-iteration #nil #t)
-    (gtk-main)))
+  (define loop (g-main-loop-new))
+  (define toplevels (gtk-window-get-toplevels))
+  (connect toplevels "items-changed"
+    (lambda args (if (equal? 0 (get-n-items toplevels)) (g-main-loop-quit loop))))
+  (g-main-loop-run loop))
 
 (define-public (gtk-timed-loop time)
-  (define timed-out #f)
-  (define (loop)
-    (when (not timed-out)
-      (g-main-context-iteration #nil #t)
-      (loop)))
-  (g-timeout-add (* time 1000) (lambda () (set! timed-out #t) #f))
-  (loop))
+  (define loop (g-main-loop-new))
+  (g-timeout-add (* time 1000) (lambda () (g-main-loop-quit loop)))
+  (g-main-loop-run loop))
 

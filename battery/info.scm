@@ -116,9 +116,12 @@
 
 (define (battery-info info)
   (define view (layout info))
+  (define scrolled
+    (make <gtk-scrolled-window> #:propagate-natural-height #t #:width-request 120 #:height-request 100
+       #:child view))
   (define copy-button
     (make <gtk-button> #:label (gettext "Copy") #:margin-top 15 #:halign 'center))
-  (define toast-overlay (make <adw-toast-overlay> #:child view))
+  (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
   (define previous-toast #f)
   (connect copy-button 'clicked
     (lambda (b)
@@ -154,7 +157,7 @@
   (define window
     (make <adw-application-window> #:application battery-info-app
       #:title (gettext "Battery Info")))
-  (set-default-size window 400 400)
+  (set-default-size window 640 480)
   (present window)
   window)
 

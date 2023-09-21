@@ -19,15 +19,21 @@ User interface is displayed using *Adw* and *Gtk* libraries.
 I would like to display number of cells, or nominal voltage to battery information.
 This is not provided by UPower interface.
 It may be guessed by the technology, voltage and state values.
+
+## libadwaita 1.4
+
+The application may possibly benefit from using adw ToolbarView widget.
+The information may be displayed in AdwActionRow's with "property" class.
+These features become available in version 1.4 of libadwaita.
+I would wait until this version is released.
   
 ## TODO
 
-- use toolbar view?
-- use properties instead of the key, value labels layout
-- content should have a scroll bar
 - deploy to flathub
-  - update screenshots
-  - describe "system" on web page
+  - [ ] update screenshots
+  - [ ] describe "system" on web page
+  - [ ] build with flatpak
+  - [ ] commit to flathub
 - post to /r/linux? and hacker news and lemmy
 
 - gi-object-show does not work on Gio.BusType enum?
