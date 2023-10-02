@@ -157,7 +157,7 @@
   (define window
     (make <adw-application-window> #:application battery-info-app
       #:title (gettext "Battery Info")))
-  (set-default-size window 640 480)
+  (set-default-size window 480 480)
   (present window)
   window)
 
