@@ -54,7 +54,7 @@
         <ul>
           <li><a href="https://www.gnu.org/software/guile/">guile 3.0</a></li>
           <li><a href="https://www.nongnu.org/guile-lib/">guile-lib 0.2.5</a></li>
-          <li><a href="https://www.gnu.org/software/g-golf/">g-golf 0.8</a></li>
+          <li><a href="https://www.gnu.org/software/g-golf/">g-golf 0.8.0-rc2</a></li>
           <li><a href="https://www.gtk.org/">gtk 4</a></li>
           <li><a href="https://gnome.pages.gitlab.gnome.org/libadwaita/">libadwaita 1.3</a></li>
         </ul>
@@ -75,11 +75,11 @@ $ sudo make install
         Then run <code>hdt</code> or alternatively <code>make</code> in the source directory.
       </p>
       <p>
-        This is a guile program using <em>g-golf</em> library
-        to access <em>Gio</em>, <em>Gtk</em> and <em>Adwaita</em> libraries.
+        This is a guile program.
         Information is collected using <a href="https://upower.freedesktop.org/docs/Device.html">UPower</a>
-        DBus interface, with the <em>gdbus</em> client from <em>Gio</em> library.
-        User interface is displayed using <em>Adwaita</em> and <em>Gtk</em> libraries.
+        DBus interface, with the <em>gdbus</em> client from <em>Glib</em> library.
+        Native library is accessed using guile's foreign interface.
+        User interface is displayed using <em>Adwaita</em> and <em>Gtk</em> via <em>g-golf</em> library.
       </p>
     </main>
     <footer>

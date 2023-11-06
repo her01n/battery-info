@@ -3,11 +3,11 @@
 (use-modules
   (ice-9 atomic) (ice-9 exceptions) (ice-9 match)
   (ice-9 textual-ports) (ice-9 threads)
-  (sxml simple) (sxml xpath))
+  (sxml simple))
 
 (use-modules (g-golf))
 
-(use-modules (gtk))
+(use-modules (dbus) (gtk))
 
 (g-irepository-require "Gtk" #:version "4.0")
 
@@ -49,11 +49,16 @@
     #:icon-name "system-search-symbolic"
     #:title (gettext "No battery detected.")))
 
+; TODO this should be exported by g-golf
+(define (markup-escape-text text)
+  ; just do the xml escape
+  (with-output-to-string (lambda () (sxml->xml text))))
+
 (define (info-error exception)
   (make <adw-status-page>
     #:icon-name "dialog-error-symbolic"
     #:title (gettext "Error reading battery info.")
-    #:description (exception-message exception)))
+    #:description (markup-escape-text (exception-message exception))))
 
 (define (info-line description value)
   (define label (make <gtk-label> #:selectable #t))
@@ -170,7 +175,17 @@
 (define (load window state get-info)
   (define get-info-proc
     (if (procedure? get-info) get-info (lambda () get-info)))
-  (with-exception-handler
+  (catch #t
+    (lambda () (atomic-box-set! state (or (get-info-proc) 'no-battery)))
+    (lambda args
+      (atomic-box-set!
+        state
+        (match args
+          ((key function (? string? message-format) (? list? message-args) values)
+           (make-exception-with-message (format #f "~a ~a: ~a" key function (apply format #f message-format message-args))))
+          (else (format #f "~S" args))))))
+          
+  #;(with-exception-handler
     (lambda (exception) (atomic-box-set! state exception))
     (lambda () (atomic-box-set! state (or (get-info-proc) 'no-battery)))
     #:unwind? #t)
@@ -185,57 +200,28 @@
   (begin-thread (load window state get-info))
   window)
 
-(define (g-variant->scm variant)
-  (define (g-variant->list)
-    (map
-      (lambda (i) (g-variant->scm (g-variant-get-child-value variant i)))
-      (iota (g-variant-n-children variant))))  
-  (match (g-variant-classify variant)
-    ('boolean (g-variant-get-boolean variant))
-    ('uint32 (g-variant-get-uint32 variant))
-    ('double (g-variant-get-double variant))
-    ('string (g-variant-get-string variant))
-    ('object-path (g-variant-get-string variant))
-    ('signature (g-variant-get-string variant))
-    ('variant (g-variant->scm (g-variant-get-child-value variant 0)))
-    ('array (list->vector (g-variant->list)))
-    ('tuple (g-variant->list))))
-
-(define timeout 1000)
-
-(define (get-property proxy name)
-  (car
-    (g-variant->scm
-      (call-sync
-        proxy "Get"
-        (g-variant-parse #f (format #f "(\"~a\", \"~a\")" "org.freedesktop.UPower.Device" name) #f #f)
-        '() timeout #f))))
+(define (device-property device property)
+  (dbus-call
+    'system "org.freedesktop.UPower" device "org.freedesktop.DBus.Properties"
+    "Get" "org.freedesktop.UPower.Device" property))
 
 (define-public (get-upower-info)
-  ; list objects of system org.freedesktop.UPower service
-  (define upower-proxy
-    (gd-bus-proxy-new-for-bus-sync
-      'system '() #f "org.freedesktop.UPower" "/org/freedesktop/UPower" "org.freedesktop.UPower" #f))
-  (define devices-names
-    (vector->list
-      (car (g-variant->scm (call-sync upower-proxy "EnumerateDevices" #f '() timeout #f)))))
-  ; find a battery and query the information
+  (define device-names
+    (dbus-call
+      'system "org.freedesktop.UPower" "/org/freedesktop/UPower" "org.freedesktop.UPower" "EnumerateDevices"))
   (find identity
     (map
       (lambda (device)
-        (define proxy
-          (gd-bus-proxy-new-for-bus-sync
-            'system '() #f "org.freedesktop.UPower" device "org.freedesktop.DBus.Properties" #f))
         (and
-          (equal? (get-property proxy "Type") 2)
-          (get-property proxy "PowerSupply")
-          `((vendor . ,(get-property proxy "Vendor"))
-            (model . ,(get-property proxy "Model"))
-            (energy-full-design . ,(get-property proxy "EnergyFullDesign"))
-            (technology . ,(get-property proxy "Technology"))
-            (energy-full . ,(get-property proxy "EnergyFull"))
-            (capacity . ,(get-property proxy "Capacity")))))
-      devices-names)))
+          (equal? (device-property device "Type") 2)
+          (device-property device "PowerSupply")
+          `((vendor . ,(device-property device "Vendor"))
+            (model . ,(device-property device "Model"))
+            (energy-full-design . ,(device-property device "EnergyFullDesign"))
+            (technology . ,(device-property device "Technology"))
+            (energy-full . ,(device-property device "EnergyFull"))
+            (capacity . ,(device-property device "Capacity")))))
+      device-names)))
 
 (define (read-dmi key)
   (define string
@@ -258,13 +244,13 @@
         (sys-model . ,(read-dmi "product_name"))))
     #:unwind? #t))
 
-(define (get-battery-info)
+(define-public (get-battery-info)
   (define upower (get-upower-info))
   (and (list? upower) (append upower (get-dmi-info))))
 
 (define-public (main args)
   (connect battery-info-app 'activate
     (lambda (app)
-      (show-battery-info get-info)))
+      (show-battery-info get-battery-info)))
   (run battery-info-app args))
 
