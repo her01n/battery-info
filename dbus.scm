@@ -59,16 +59,14 @@
 (define g_variant_get_int64
   (foreign-library-function gio "g_variant_get_int64" #:return-type int64 #:arg-types (list '*)))
 
-(define g-variant-n-children g_variant_n_children)
-
 (define g_variant_get_uint16
-  (foreign-library-function gio "g_variant_get_int16" #:return-type uint16 #:arg-types (list '*)))
+  (foreign-library-function gio "g_variant_get_uint16" #:return-type uint16 #:arg-types (list '*)))
 
 (define g_variant_get_uint32
-  (foreign-library-function gio "g_variant_get_int16" #:return-type uint32 #:arg-types (list '*)))
+  (foreign-library-function gio "g_variant_get_uint32" #:return-type uint32 #:arg-types (list '*)))
 
 (define g_variant_get_uint64
-  (foreign-library-function gio "g_variant_get_int16" #:return-type uint64 #:arg-types (list '*)))
+  (foreign-library-function gio "g_variant_get_uint64" #:return-type uint64 #:arg-types (list '*)))
 
 (define (variant->scm variant)
   (define (variant->list)

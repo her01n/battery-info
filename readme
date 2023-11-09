@@ -31,31 +31,16 @@ I would wait until this version is released.
   
 - deploy to flathub
   - [ ] update screenshots
+    I only have one computer right now, i am making both screenshots there 
   - [ ] describe "system" on web page
   - [ ] build with flatpak
   - [ ] commit to flathub
 - post to /r/linux? and hacker news and lemmy
 
-- gi-object-show does not work on Gio.BusType enum?
-- 
-  This does not work, it halts:
-  ```
-  (use-modules (g-golf))
-  (gi-import "GLib")
-  (g-variant-new-string "hello")
-  ```
-  But with <code>(gi-import "Gio")</code> it works.
-- g-variant-new-array is not possible to use?
 - g-irepository-get-infos should work
 - object info from g-irepository-get-info should have nice string representation
-
-- gvariants should be handled better:
-  - two functions to convert between a variant and scheme value
-  - accept scheme values in place of gvariant arguments.
-
 - g-golf browser?
 
 - guile should print backtrace,
   in case the exception is thrown from a thread.
 
-- report selection bug, see select.scm

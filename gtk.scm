@@ -1,5 +1,7 @@
 (define-module (gtk))
 
+(import (ice-9 threads))
+
 (use-modules (g-golf))
 
 (gi-import-by-name "Adw" "ApplicationWindow")
@@ -56,4 +58,13 @@
   (define loop (g-main-loop-new))
   (g-timeout-add (* time 1000) (lambda () (g-main-loop-quit loop)))
   (g-main-loop-run loop))
+
+(define-public (work worker done fail)
+  (begin-thread
+    (catch #t
+      (lambda ()
+        (define result (worker))
+        (g-idle-add (lambda () (done result) #f)))
+      (lambda args
+        (g-idle-add (lambda () (apply fail args) #f))))))
 

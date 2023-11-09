@@ -1,9 +1,9 @@
 (define-module (battery info))
 
 (use-modules
-  (ice-9 atomic) (ice-9 exceptions) (ice-9 match)
-  (ice-9 textual-ports) (ice-9 threads)
-  (sxml simple))
+  (ice-9 exceptions) (ice-9 match) (ice-9 textual-ports)
+  (sxml simple)
+  (srfi srfi-2))
 
 (use-modules (g-golf))
 
@@ -20,6 +20,7 @@
 (gi-import-by-name "Gtk" "Label")
 (gi-import-by-name "Gtk" "ScrolledWindow")
 (gi-import-by-name "Gtk" "Spinner")
+(gi-import-by-name "Adw" "AboutWindow")
 (gi-import-by-name "Adw" "HeaderBar")
 (gi-import-by-name "Adw" "Application")
 (gi-import-by-name "Adw" "ApplicationWindow")
@@ -66,11 +67,6 @@
   label)
 
 (define (vertical-glue) (make <gtk-label> #:valign 'fill #:vexpand #t))
-
-(define (meta-line text)
-  (define label (make <gtk-label>))
-  (set-markup label (format #f "<i>~a</i>" text))
-  label)
 
 (define (join null a b)
   (define s
@@ -138,66 +134,73 @@
         (set! previous-toast (ref toast)))))
   (vertical-box toast-overlay copy-button))
 
-(define (window-content state)
-  (define content
-    (match (atomic-box-ref state)
-      ('loading (loading))
-      ('no-battery (no-battery))
-      ((? exception? exception) (info-error exception))
-      (info (battery-info info))))
-  (define bordered
-    (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
-      #:margin-left 10 #:margin-right 10))
-  (append bordered content)
-  (append bordered (vertical-glue))
-  (append bordered (meta-line (gettext "Made by Michal Herko")))
-  (vertical-box (make <adw-header-bar>) bordered))
+(define (show-about main-window)
+  (define about-window
+    (make <adw-about-window>
+      #:application-icon "com.her01n.BatteryInfo" #:application-name "Battery Info"
+      #:copyright "© 2023 Michal Herko" #:developer-name "Michal Herko"
+      #:issue-url "https://github.com/her01n/battery-info/issues"
+      #:license-type 'gpl-3-0 #:version "0.1" #:website "https://herko.it/battery-info"
+      #:transient-for main-window))
+  (present about-window))
+
+(define (content state)
+  (match state
+    ('loading (loading))
+    ('no-battery (no-battery))
+    ((? exception? exception) (info-error exception))
+    (info (battery-info info))))
 
 (define-public battery-info-app
   (make <adw-application> #:application-id "com.her01n.BatteryInfo"))
 
 (register battery-info-app #f)
 
-(define (present-window)
+(define (make-window container)
+  (define header (make <adw-header-bar>))
+  (define about-button
+    (make <gtk-button> #:label (gettext "About") #:icon-name "help-about-symbolic"))
+  (pack-end header about-button)
+  (define bordered
+    (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
+      #:margin-left 10 #:margin-right 10))
+  (append bordered container)
+  (append bordered (vertical-glue))
   (define window
     (make <adw-application-window> #:application battery-info-app
       #:title (gettext "Battery Info")))
   (set-default-size window 480 480)
-  (present window)
+  (set-content window (vertical-box header bordered))
+  (connect about-button 'clicked (lambda args (show-about window)))
   window)
+  
+(define (make-container) (make <gtk-box> #:orientation 'vertical))
 
-(define (update window state)
-  (define content (window-content state))
-  ; workaround to avoid selecting the battery name
-  (set-content window #f)
-  (g-idle-add (lambda () (set-content window content) #f)))
-
-(define (load window state get-info)
-  (define get-info-proc
-    (if (procedure? get-info) get-info (lambda () get-info)))
-  (catch #t
-    (lambda () (atomic-box-set! state (or (get-info-proc) 'no-battery)))
-    (lambda args
-      (atomic-box-set!
-        state
-        (match args
-          ((key function (? string? message-format) (? list? message-args) values)
-           (make-exception-with-message (format #f "~a ~a: ~a" key function (apply format #f message-format message-args))))
-          (else (format #f "~S" args))))))
-          
-  #;(with-exception-handler
-    (lambda (exception) (atomic-box-set! state exception))
-    (lambda () (atomic-box-set! state (or (get-info-proc) 'no-battery)))
-    #:unwind? #t)
-  (g-idle-add (lambda () (update window state) #f)))
+(define (update window container state)
+  (and-let*
+    ((child (get-first-child container)))
+    (remove container child))
+  (append container (content state))
+  (if (not (is-visible window)) (present window)))
 
 (define-public (show-battery-info get-info)
-  (define state (make-atomic-box 'loading))
-  (define window (present-window))
+  (define container (make-container))
+  (define window (make-window container))
   ; delay displaying the spinner a little,
   ; so it does not blink if the loading is fast
-  (g-timeout-add 200 (lambda () (update window state) #f))
-  (begin-thread (load window state get-info))
+  (g-timeout-add 200
+    (lambda () (if (not (is-visible window)) (update window container 'loading)) #f))
+  (work
+    (if (procedure? get-info) get-info (lambda () get-info))
+    (lambda (result)
+      (update window container (or result 'no-battery)))
+    (lambda args
+      (update window container
+        (make-exception-with-message
+          (match args
+            ((key function (? string? message-format) (? list? message-args) values)
+             (format #f "~a ~a: ~a" key function (apply format #f message-format message-args)))
+            (else (format #f "~S" args)))))))
   window)
 
 (define (device-property device property)
