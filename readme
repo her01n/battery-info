@@ -30,9 +30,9 @@ I would wait until this version is released.
 ## TODO
   
 - deploy to flathub
-  - [ ] update screenshots
+  - [x] update screenshots
     I only have one computer right now, i am making both screenshots there 
-  - [ ] describe "system" on web page
+  - [x] describe "system" on web page
   - [ ] build with flatpak
   - [ ] commit to flathub
 - post to /r/linux? and hacker news and lemmy
