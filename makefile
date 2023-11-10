@@ -30,6 +30,7 @@ install-mos:
 install: install-mos
 	install --directory $(SITE)/battery
 	sed s!"locale"!"$(PREFIX)/share/locale"! <battery/info.scm >$(SITE)/battery/info.scm
+	install -D -t $(SITE) dbus.scm
 	install -D -t $(SITE) gtk.scm
 	install -D -t $(PREFIX)/bin battery-info
 	install -D -t $(PREFIX)/share/icons/hicolor/scalable/apps/ com.her01n.BatteryInfo.svg

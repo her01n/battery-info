@@ -1,4 +1,9 @@
 battery-info.pot
+build-dir
 locale
+.flatpak-builder
+
 Adw.txt
 Gtk.txt
+GLib.txt
+Gio.txt

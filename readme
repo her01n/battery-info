@@ -33,7 +33,8 @@ I would wait until this version is released.
   - [x] update screenshots
     I only have one computer right now, i am making both screenshots there 
   - [x] describe "system" on web page
-  - [ ] build with flatpak
+  - [x] build with flatpak
+  - [ ] tag 0.1 release on github
   - [ ] commit to flathub
 - post to /r/linux? and hacker news and lemmy
 
