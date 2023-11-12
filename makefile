@@ -30,11 +30,12 @@ install-mos:
 install: install-mos
 	install --directory $(SITE)/battery
 	sed s!"locale"!"$(PREFIX)/share/locale"! <battery/info.scm >$(SITE)/battery/info.scm
-	install -D -t $(SITE) dbus.scm
-	install -D -t $(SITE) gtk.scm
+	install -D -t $(SITE) dbus.scm --mode=0644
+	install -D -t $(SITE) gtk.scm --mode=0644
 	install -D -t $(PREFIX)/bin battery-info
-	install -D -t $(PREFIX)/share/icons/hicolor/scalable/apps/ com.her01n.BatteryInfo.svg
-	install -D -t $(PREFIX)/share/applications com.her01n.BatteryInfo.desktop
+	install -D -t $(PREFIX)/share/icons/hicolor/scalable/apps/ com.her01n.BatteryInfo.svg --mode=0644
+	install -D -t $(PREFIX)/share/applications com.her01n.BatteryInfo.desktop --mode=0644
+	install -D -t $(PREFIX)/share/metainfo com.her01n.BatteryInfo.metainfo.xml --mode=0644
 
 deploy:
 	rsync --update --archive --delete \

@@ -34,8 +34,12 @@ I would wait until this version is released.
     I only have one computer right now, i am making both screenshots there 
   - [x] describe "system" on web page
   - [x] build with flatpak
-  - [ ] tag 0.1 release on github
+  - [x] tag 0.1 release on github
+  - [ ] fix flathub build
+  - [ ] add appdata file
+  - [ ] add screenshots to metadata?
   - [ ] commit to flathub
+  - [ ] add instructions about flathub to the web
 - post to /r/linux? and hacker news and lemmy
 
 - g-irepository-get-infos should work

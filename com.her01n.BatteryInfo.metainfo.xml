@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2023 Michal Herko -->
+<component type="desktop-application">
+  <id>com.her01n.BatteryInfo</id>
+  <metadata_license>MIT</metadata_license>
+  <name>Battery Info</name>
+  <summary>Shows informations about the system battery.</summary>
+  <description>
+    <p>
+      Displays informations about the installed battery:
+      <ul>
+        <li>Vendor and model</li>
+        <li>Technology</li>
+        <li>Nominal capacity</li>
+        <li>Actual capacity</li>
+        <li>Capacity ratio</li>
+      </ul>
+    </p>
+  </description>
+  <icon>com.her01n.BatteryInfo</icon>
+  <categories>
+    <category>System</category>
+    <category>Utilities</category>
+  </categories>
+  <url type="homepage">
+    https://herko.it/battery-info
+  </url>
+  <url type="bugtracker">
+    https://github.com/her01n/battery-info/issue
+  </url>
+  <launchable type="desktop-id">com.her01n.BatteryInfo</launchable>
+  <developer_name>Michal Herko</developer_name>
+  <translation type="gettext">battery-info</translation>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1" date="2023-11-12">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+</component>
+
