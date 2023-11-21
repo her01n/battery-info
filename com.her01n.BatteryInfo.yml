@@ -36,7 +36,16 @@ modules:
     buildsystem: simple
     build-commands:
       - make PREFIX=/app install
+      - mkdir -p /app/lib
+      - ln -s /usr/lib/$HOSTTYPE-$OSTYPE/libgio-2.0.so.0 /app/lib/libgio-2.0.so
+      - ln -s /usr/lib/$HOSTTYPE-$OSTYPE/libgirepository-1.0.so.1 /app/lib/libgirepository-1.0.so
+      - ln -s /usr/lib/$HOSTTYPE-$OSTYPE/libglib-2.0.so.0 /app/lib/libglib-2.0.so
+      - ln -s /usr/lib/$HOSTTYPE-$OSTYPE/libgobject-2.0.so.0 /app/lib/libgobject-2.0.so      
     sources:
       - type: dir
         path: .
-
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --system-talk-name=org.freedesktop.UPower
