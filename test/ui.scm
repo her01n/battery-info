@@ -34,7 +34,7 @@
 
 (test capacity
   (define window
-    (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96))))
+    (test-battery-info '((energy-full-design . 50) (energy-full . 48) (capacity . 96.4))))
   (assert (string-contains (text window) "48 Wh"))
   (assert (string-contains (text window) "96%")))
 

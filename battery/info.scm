@@ -101,7 +101,8 @@
       (capacity->string (assoc-ref info 'energy-full)))
     (info-line (gettext "Capacity percentage")
       (match (assoc-ref info 'capacity)
-        ((and (? real?) (not 0.0) capacity) (format #f "~a%" (round capacity)))
+        ((and (? real?) (not 0.0) capacity)
+         (format #f "~a%" (inexact->exact (round capacity))))
         (else (gettext "Unknown"))))))
 
 (define (copy-to-clipboard text)
