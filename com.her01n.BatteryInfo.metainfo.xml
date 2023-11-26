@@ -2,22 +2,21 @@
 <!-- Copyright 2023 Michal Herko -->
 <component type="desktop-application">
   <id>com.her01n.BatteryInfo</id>
-  <metadata_license>MIT</metadata_license>
+  <metadata_license>CC0-1.0</metadata_license>
   <name>Battery Info</name>
   <summary>Shows informations about the system battery.</summary>
   <description>
     <p>
-      Displays informations about the installed battery:
-      <ul>
-        <li>Vendor and model</li>
-        <li>Technology</li>
-        <li>Nominal capacity</li>
-        <li>Actual capacity</li>
-        <li>Capacity ratio</li>
-      </ul>
+      Displays informations about the installed battery.
     </p>
+    <ul>
+      <li>Vendor and model</li>
+      <li>Technology</li>
+      <li>Nominal capacity</li>
+      <li>Actual capacity</li>
+      <li>Capacity ratio</li>
+    </ul>
   </description>
-  <icon>com.her01n.BatteryInfo</icon>
   <categories>
     <category>System</category>
     <category>Utilities</category>
@@ -28,10 +27,11 @@
   <url type="bugtracker">
     https://github.com/her01n/battery-info/issue
   </url>
-  <launchable type="desktop-id">com.her01n.BatteryInfo</launchable>
+  <launchable type="desktop-id">com.her01n.BatteryInfo.desktop</launchable>
   <developer_name>Michal Herko</developer_name>
   <translation type="gettext">battery-info</translation>
   <content_rating type="oars-1.1" />
+  <project_license>GPL-3.0-or-later</project_license>
   <releases>
     <release version="0.1" date="2023-11-12">
       <description>
@@ -39,5 +39,23 @@
       </description>
     </release>
   </releases>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://herko.it/battery-info/screenshots/toymaker-light.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://herko.it/battery-info/screenshots/taran-dark.png</image>
+    </screenshot>
+  </screenshots>
+  <provides>
+    <binary>battery-info</binary>
+  </provides>
+  <supports>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
+  <recommends>
+    <display_length compare="ge">400</display_length>
+  </recommends>
 </component>
 
