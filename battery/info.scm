@@ -161,7 +161,7 @@
   (define header (make <adw-header-bar>))
   (define about-button
     (make <gtk-button> #:label (gettext "About") #:icon-name "help-about-symbolic"))
-  (pack-end header about-button)
+  (pack-start header about-button)
   (define bordered
     (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
       #:margin-left 10 #:margin-right 10))
@@ -170,7 +170,7 @@
   (define window
     (make <adw-application-window> #:application battery-info-app
       #:title (gettext "Battery Info")))
-  (set-default-size window 480 480)
+  (set-default-size window 400 320)
   (set-content window (vertical-box header bordered))
   (connect about-button 'clicked (lambda args (show-about window)))
   window)
