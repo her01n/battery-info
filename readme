@@ -31,16 +31,20 @@ I would wait until this version is released.
   
 - deploy to flathub
   - [x] update screenshots
-    I only have one computer right now, i am making both screenshots there 
   - [x] describe "system" on web page
   - [x] build with flatpak
   - [x] tag 0.1 release on github
-  - [ ] fix flathub build
-  - [ ] add appdata file
-  - [ ] add screenshots to metadata?
+  - [x] fix flathub build - precompile? or disable cache?
+  - [x] add appdata file
+  - [x] add screenshots to metadata
+  - [x] go through flathub requirements one more time
+  - [ ] convert yml to json
+  - [ ] fix the release to current
   - [ ] commit to flathub
   - [ ] add instructions about flathub to the web
+- [ ] web: make the screenshots display side by side on desktop
 - post to /r/linux? and hacker news and lemmy
+- software still displays desktop only
 
 - g-irepository-get-infos should work
 - object info from g-irepository-get-info should have nice string representation
