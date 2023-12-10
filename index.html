@@ -59,7 +59,12 @@
           For values below 75% it is recommended to replace the battery.
         </li>
       </ul>
-      <h2>Build and Install</h2>
+      <h2>Install</h2>
+      <p>
+        Please install this <a href="com.her01n.BatteryInfo.flatpakref">application</a> using flatpak.
+        Refer <a href="https://flatpak.org/setup/">here</a> to setup flatpak if necessary.
+      </p>
+      <h2>Build</h2>
       <p>
         First install the requirements.
         <ul>
@@ -76,8 +81,9 @@
 </pre></code>
       </p>
       <p>
-        You can now run the application locally or install it.
-<pre><code>$ ./battery-info
+        You can now build the application, run it locally or install it.
+<pre><code>$ make mos
+$ ./battery-info
 $ sudo make install
 </code></pre>
       </p>

@@ -29,20 +29,11 @@ I would wait until this version is released.
   
 ## TODO
   
-- deploy to flathub
-  - [x] update screenshots
-  - [x] describe "system" on web page
-  - [x] build with flatpak
-  - [x] tag 0.1 release on github
-  - [x] fix flathub build - precompile? or disable cache?
-  - [x] add appdata file
-  - [x] add screenshots to metadata
-  - [x] go through flathub requirements one more time
-  - [ ] convert yml to json
-  - [ ] fix the release to current
-  - [ ] commit to flathub
-  - [ ] add instructions about flathub to the web
-- [ ] web: make the screenshots display side by side on desktop
+- do i need to specify the prefix in source for translations?
+- nicer make:
+  - make should build gettext files and pre-compile scheme files
+  - make test should test the application
+  - make install should only install the files
 - post to /r/linux? and hacker news and lemmy
 - software still displays desktop only
 

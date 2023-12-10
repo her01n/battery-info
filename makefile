@@ -44,6 +44,6 @@ install: install-mos
 
 deploy:
 	rsync --update --archive --delete \
-		index.html screenshots \
+		com.her01n.BatteryInfo.flatpakref index.html screenshots \
 		sykorka.herko.it:/var/www/herko.it/battery-info/
 
