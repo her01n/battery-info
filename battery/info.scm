@@ -36,7 +36,7 @@
   box)
 
 (define* (h1 title #:key selectable)
-  (make <gtk-label> #:css-classes (list "title-1") #:margin-bottom 5
+  (make <gtk-label> #:css-classes (list "title-1") #:margin-top 10 #:margin-bottom 10
     #:label title #:selectable selectable))
 
 (define (loading)
@@ -117,12 +117,12 @@
        ((lambda () exp ...))))))
 
 (define (battery-info info)
-  (define view (layout info))
+  (define view (apply vertical-box (map layout info)))
   (define scrolled
     (make <gtk-scrolled-window> #:propagate-natural-height #t #:width-request 120 #:height-request 100
-       #:child view))
+      #:overlay-scrolling #f #:child view))
   (define copy-button
-    (make <gtk-button> #:label (gettext "Copy") #:margin-top 15 #:halign 'center))
+    (make <gtk-button> #:label (gettext "Copy") #:margin-top 20 #:halign 'center))
   (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
   (define previous-toast #f)
   (connect copy-button 'clicked
@@ -141,14 +141,14 @@
       #:application-icon "com.her01n.BatteryInfo" #:application-name "Battery Info"
       #:copyright "© 2023 Michal Herko" #:developer-name "Michal Herko"
       #:issue-url "https://github.com/her01n/battery-info/issues"
-      #:license-type 'gpl-3-0 #:version "0.1" #:website "https://herko.it/battery-info"
+      #:license-type 'gpl-3-0 #:version "0.1.1" #:website "https://herko.it/battery-info"
       #:transient-for main-window))
   (present about-window))
 
 (define (content state)
   (match state
     ('loading (loading))
-    ('no-battery (no-battery))
+    ('() (no-battery))
     ((? exception? exception) (info-error exception))
     (info (battery-info info))))
 
@@ -162,16 +162,11 @@
   (define about-button
     (make <gtk-button> #:label (gettext "About") #:icon-name "help-about-symbolic"))
   (pack-start header about-button)
-  (define bordered
-    (make <gtk-box> #:orientation 'vertical #:margin-top 10 #:margin-bottom 10
-      #:margin-left 10 #:margin-right 10))
-  (append bordered container)
-  (append bordered (vertical-glue))
   (define window
     (make <adw-application-window> #:application battery-info-app
       #:title (gettext "Battery Info")))
-  (set-default-size window 400 320)
-  (set-content window (vertical-box header bordered))
+  (set-default-size window 440 440)
+  (set-content window (vertical-box header container (vertical-glue)))
   (connect about-button 'clicked (lambda args (show-about window)))
   window)
   
@@ -194,7 +189,7 @@
   (work
     (if (procedure? get-info) get-info (lambda () get-info))
     (lambda (result)
-      (update window container (or result 'no-battery)))
+      (update window container result))
     (lambda args
       (update window container
         (make-exception-with-message
@@ -213,7 +208,7 @@
   (define device-names
     (dbus-call
       'system "org.freedesktop.UPower" "/org/freedesktop/UPower" "org.freedesktop.UPower" "EnumerateDevices"))
-  (find identity
+  (filter identity
     (map
       (lambda (device)
         (and
@@ -249,8 +244,10 @@
     #:unwind? #t))
 
 (define-public (get-battery-info)
-  (define upower (get-upower-info))
-  (and (list? upower) (append upower (get-dmi-info))))
+  (define dmi-info (get-dmi-info))
+  (map
+    (lambda (upower-info) (append upower-info dmi-info))
+    (get-upower-info)))
 
 (define-public (main args)
   (connect battery-info-app 'activate

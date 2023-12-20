@@ -29,13 +29,33 @@ I would wait until this version is released.
   
 ## TODO
   
+- more batteries
+  - [x] branch to test more batteries
+  - [x] bigger window
+  - [x] display more batteries
+  - [x] vertical scrolling,
+        make sure the scroll bar is always visible if there is more content
+  - [ ] push into beta branch,
+        branch feature/more-batteries in battery-info
+        branch beta in flathub
+  - [ ] build and publish beta version
+  - [ ] ask lemonzest to test
+
+- keyboard shortcuts
+  - [ ] ctrl+w, ctrl+q to close the window
+  - [ ] ctrl+a to select all, would this work?
+  - [ ] ctrl+c to copy all the info if nothing is selected?
+        or ctrl+shift+c, or just enter?
 - do i need to specify the prefix in source for translations?
 - nicer make:
   - make should build gettext files and pre-compile scheme files
   - make test should test the application
   - make install should only install the files
 - post to /r/linux? and hacker news and lemmy
-- software still displays desktop only
+- gnome software still displays desktop only,
+  the app should work on almost anything
+- why does user have application data?
+  we should not need to store any data
 
 - g-irepository-get-infos should work
 - object info from g-irepository-get-info should have nice string representation

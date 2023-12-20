@@ -5,21 +5,34 @@
 
 (define (delayed value) (lambda () (usleep (* 200 1000)) value))
 
+(define battery-one
+  '((vendor . "ACME")
+    (model . "B1")
+    (sys-vendor . "Compaq")
+    (sys-model . "Portable")
+    (energy-full-design . 99)
+    (technology . 2)
+    (energy-full . 90)
+    (capacity . 90)))
+
+(define battery-two
+  '((vendor . "ACME")
+    (model . "B-02")
+    (sys-vendor . "Compaq")
+    (sys-model . "Portable")
+    (energy-full-design . 65)
+    (technology . 1)
+    (energy-full . 64)
+    (capacity . 99)))
+
 (define test-get-info
   (match (command-line)
     ((or (cmd) (cmd "good-battery"))
-     (delayed
-       '((vendor . "ACME")
-         (model . "B1")
-         (sys-vendor . "Compaq")
-         (sys-model . "Portable")
-         (energy-full-design . 99)
-         (technology . 2)
-         (energy-full . 90)
-         (capacity . 90))))
-    ((cmd "no-battery") (delayed #f))
+     (delayed (list battery-one)))
+    ((cmd "no-battery") (delayed '()))
     ((cmd "error") (lambda () (sleep 1) (error "test error")))
-    ((cmd "loading") (lambda () (sleep 99) '((vendor . "ACME"))))
+    ((cmd "loading") (lambda () (sleep 99) '(((vendor . "ACME")))))
+    ((cmd (or "more" "more-batteries")) (delayed (list battery-one battery-two)))
     (else (error "Please specify test from: good-battery no-battery error loading"))))
 
 (add-to-load-path (dirname (current-filename)))
