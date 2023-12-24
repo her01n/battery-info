@@ -47,6 +47,7 @@
     (click (get-active-window widget) text)
     (activate (find-child widget should-click))))
 
+; TODO remove this and use run also for testing
 (define-public (gtk-main)
   (define loop (g-main-loop-new))
   (define toplevels (gtk-window-get-toplevels))

@@ -4,92 +4,96 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-18 18:54+0100\n"
+"POT-Creation-Date: 2023-12-24 12:39+0100\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: battery/info.scm:46
+#: battery/info.scm:62
 msgid "Loading"
 msgstr "Načítava sa"
 
-#: battery/info.scm:51
+#: battery/info.scm:67
 msgid "No battery detected."
 msgstr "Nenašla sa žiadna batéria."
 
-#: battery/info.scm:61
+#: battery/info.scm:77
 msgid "Error reading battery info."
 msgstr "Chyba pri zisťovaní informácií o batérii."
 
-#: battery/info.scm:80 battery/info.scm:88 battery/info.scm:97
-#: battery/info.scm:106
+#: battery/info.scm:96 battery/info.scm:104 battery/info.scm:113
+#: battery/info.scm:122
 msgid "Unknown"
 msgstr "Neznáme"
 
-#: battery/info.scm:85
+#: battery/info.scm:101
 msgid "Unknown Battery"
 msgstr "Neznáma batéria"
 
-#: battery/info.scm:87
+#: battery/info.scm:103
 msgid "System"
 msgstr "Systém"
 
-#: battery/info.scm:89
+#: battery/info.scm:105
 msgid "Technology"
 msgstr "Technológia"
 
-#: battery/info.scm:91
+#: battery/info.scm:107
 msgid "Lithium ion"
 msgstr "lítium-iónová"
 
-#: battery/info.scm:92
+#: battery/info.scm:108
 msgid "Lithium polymer"
 msgstr "lítium-polymérová"
 
-#: battery/info.scm:93
+#: battery/info.scm:109
 msgid "Lithium iron phosphate"
 msgstr "lítium-železo-fosfátová"
 
-#: battery/info.scm:94
+#: battery/info.scm:110
 msgid "Lead acid"
 msgstr "olovená"
 
-#: battery/info.scm:95
+#: battery/info.scm:111
 msgid "Nickel cadmium"
 msgstr "nikel-kadmiová"
 
-#: battery/info.scm:96
+#: battery/info.scm:112
 msgid "Nickel metal hydride"
 msgstr "nikel-metalhydridová"
 
-#: battery/info.scm:98
+#: battery/info.scm:114
 msgid "Nominal capacity"
 msgstr "Nominálna kapacita"
 
-#: battery/info.scm:100
+#: battery/info.scm:116
 msgid "Actual capacity"
 msgstr "Skutočná kapacita"
 
-#: battery/info.scm:102
+#: battery/info.scm:118
 msgid "Capacity percentage"
 msgstr "Pomer kapacity"
 
-#: battery/info.scm:125
+#: battery/info.scm:137
 msgid "Copy"
 msgstr "Kopírovať"
 
-#: battery/info.scm:132
+#: battery/info.scm:143
 msgid "Info copied to clipboard."
 msgstr "Info skopírované do schránky."
 
-#: battery/info.scm:163
-msgid "About"
+#: battery/info.scm:151
+msgid "Dump UPower Info"
 msgstr ""
 
-#: battery/info.scm:167
+#: battery/info.scm:215 battery/info.scm:225
 msgid "Battery Info"
 msgstr "Info o batérii"
+
+#: battery/info.scm:221
+msgid "About"
+msgstr ""
 
 #~ msgid "Made by Michal Herko"
 #~ msgstr "Aplikáciu vyrobil Michal Herko"

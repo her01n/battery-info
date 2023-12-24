@@ -3,7 +3,8 @@
 (use-modules
   (ice-9 exceptions) (ice-9 match) (ice-9 textual-ports)
   (sxml simple)
-  (srfi srfi-2))
+  (srfi srfi-2)
+  (system foreign) (system foreign-library))
 
 (use-modules (g-golf))
 
@@ -15,8 +16,10 @@
 (gi-import-by-name "Gdk" "Display")
 (gi-import-by-name "Gio" "Application")
 (gi-import-by-name "Gio" "DBusProxy")
+(gi-import-by-name "Gio" "File")
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Button")
+(gi-import-by-name "Gtk" "FileChooserNative")
 (gi-import-by-name "Gtk" "Label")
 (gi-import-by-name "Gtk" "ScrolledWindow")
 (gi-import-by-name "Gtk" "Spinner")
@@ -33,6 +36,19 @@
 (define (vertical-box . children)
   (define box (make <gtk-box> #:orientation 'vertical))
   (for-each (lambda (child) (append box child)) children)
+  box)
+  
+(define (take-until pred clist)
+  (take-while (lambda (e) (not (pred e))) clist))
+
+(define (drop-until pred clist)
+  (drop-while (lambda (e) (not (pred e))) clist))
+
+(define (horizontal-box . args)
+  (define children (take-until keyword? args))
+  (define keyword-args (drop-until keyword? args))
+  (define box (apply make <gtk-box> #:orientation 'horizontal keyword-args))
+  (for-each (lambda (child) (gtk-box-append box child)) children)
   box)
 
 (define* (h1 title #:key selectable)
@@ -116,14 +132,9 @@
        (format #t "trace ~a\n" (list name ...))
        ((lambda () exp ...))))))
 
-(define (battery-info info)
-  (define view (apply vertical-box (map layout info)))
-  (define scrolled
-    (make <gtk-scrolled-window> #:propagate-natural-height #t #:width-request 120 #:height-request 100
-      #:overlay-scrolling #f #:child view))
+(define (copy-button view toast-overlay)
   (define copy-button
-    (make <gtk-button> #:label (gettext "Copy") #:margin-top 20 #:halign 'center))
-  (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
+    (make <gtk-button> #:label (gettext "Copy")))
   (define previous-toast #f)
   (connect copy-button 'clicked
     (lambda (b)
@@ -133,7 +144,36 @@
         (add-toast toast-overlay toast)
         (if previous-toast (unref previous-toast))
         (set! previous-toast (ref toast)))))
-  (vertical-box toast-overlay copy-button))
+  copy-button)
+
+(define (dump-button)
+  (define dump-button
+    (make <gtk-button> #:label (gettext "Dump UPower Info")))
+  (connect dump-button 'clicked
+    (lambda (b)
+      (define info (all-upower-info))
+      (define window (get-root dump-button))
+      (define file-chooser
+        (make <gtk-file-chooser-native> #:action 'save #:transient-for window #:modal #t))
+      (set-current-name file-chooser "upower.xml")
+      (connect file-chooser 'response
+        (lambda (file-chooser response)
+          (define file (get-file file-chooser))
+          (define path (get-path file))
+          (with-output-to-file path (lambda () (display info) (newline)))))
+      (show file-chooser)))
+  dump-button)
+
+(define (battery-info info)
+  (define view (apply vertical-box (map layout info)))
+  (define scrolled
+    (make <gtk-scrolled-window> #:propagate-natural-height #t #:width-request 120 #:height-request 100
+      #:overlay-scrolling #f #:child view))
+  (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
+  (define buttons
+    (horizontal-box (copy-button view toast-overlay) (dump-button)
+      #:margin-top 20 #:halign 'center #:spacing 10))
+  (vertical-box toast-overlay buttons))
 
 (define (show-about main-window)
   (define about-window
@@ -156,6 +196,24 @@
   (make <adw-application> #:application-id "com.her01n.BatteryInfo"))
 
 (register battery-info-app #f)
+
+; would be better to always call application-run
+(define glib (load-foreign-library "libglib-2.0"))
+
+(define g_set_application_name
+ (foreign-library-function glib "g_set_application_name" #:arg-types (list '*)))
+
+(define (g-set-application-name name)
+  (g_set_application_name (string->pointer name)))
+
+(define g_set_prgname
+  (foreign-library-function glib "g_set_prgname" #:arg-types (list '*)))
+
+(define (g-set-prgname name)
+  (g_set_prgname (string->pointer name)))
+  
+(g-set-application-name (gettext "Battery Info"))
+(g-set-prgname "battery-info")
 
 (define (make-window container)
   (define header (make <adw-header-bar>))
@@ -204,10 +262,12 @@
     'system "org.freedesktop.UPower" device "org.freedesktop.DBus.Properties"
     "Get" "org.freedesktop.UPower.Device" property))
 
+(define (device-names)
+  (dbus-call
+    'system "org.freedesktop.UPower" "/org/freedesktop/UPower"
+    "org.freedesktop.UPower" "EnumerateDevices"))
+
 (define-public (get-upower-info)
-  (define device-names
-    (dbus-call
-      'system "org.freedesktop.UPower" "/org/freedesktop/UPower" "org.freedesktop.UPower" "EnumerateDevices"))
   (filter identity
     (map
       (lambda (device)
@@ -220,7 +280,27 @@
             (technology . ,(device-property device "Technology"))
             (energy-full . ,(device-property device "EnergyFull"))
             (capacity . ,(device-property device "Capacity")))))
-      device-names)))
+      (device-names))))
+
+(define-public (all-upower-info)
+  (with-output-to-string
+    (lambda ()
+      (sxml->xml
+        (apply list 'devices
+          (map
+            (lambda (device)
+              (apply list 'device
+                (list 'name device)
+                (map
+                  (lambda (property)
+                    (list (string->symbol property) (device-property device property)))
+                  (list "BatteryLevel" "Capacity" "ChargeCycles" "Energy" "EnergyEmpty"
+                    "EnergyFull" "EnergyFullDesign" "EnergyRate" "HasHistory"
+                    "HasStatistics" "IconName" "IsPresent" "IsRechargeable" "Luminosity"
+                    "Model" "NativePath" "Online" "Percentage" "PowerSupply" "Serial"
+                    "State" "Technology" "Temperature" "TimeToEmpty" "TimeToFull"
+                    "Type" "UpdateTime" "Vendor" "Voltage" "WarningLevel"))))
+            (apply list "/org/freedesktop/UPower/devices/DisplayDevice" (device-names))))))) )
 
 (define (read-dmi key)
   (define string

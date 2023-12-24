@@ -1,4 +1,5 @@
 battery-info.pot
+build
 build-dir
 locale
 .flatpak-builder
@@ -7,3 +8,5 @@ Adw.txt
 Gtk.txt
 GLib.txt
 Gio.txt
+
+upower.xml
