@@ -197,24 +197,6 @@
 
 (register battery-info-app #f)
 
-; would be better to always call application-run
-(define glib (load-foreign-library "libglib-2.0"))
-
-(define g_set_application_name
- (foreign-library-function glib "g_set_application_name" #:arg-types (list '*)))
-
-(define (g-set-application-name name)
-  (g_set_application_name (string->pointer name)))
-
-(define g_set_prgname
-  (foreign-library-function glib "g_set_prgname" #:arg-types (list '*)))
-
-(define (g-set-prgname name)
-  (g_set_prgname (string->pointer name)))
-  
-(g-set-application-name (gettext "Battery Info"))
-(g-set-prgname "battery-info")
-
 (define (make-window container)
   (define header (make <adw-header-bar>))
   (define about-button
@@ -329,9 +311,13 @@
     (lambda (upower-info) (append upower-info dmi-info))
     (get-upower-info)))
 
-(define-public (main args)
+(define* (run-battery-info #:key (get-info get-battery-info) (args '()))
   (connect battery-info-app 'activate
-    (lambda (app)
-      (show-battery-info get-battery-info)))
+    (lambda (app) (show-battery-info get-info)))
   (run battery-info-app args))
+
+(export run-battery-info)
+
+(define-public (main args)
+  (run-battery-info #:args args))
 

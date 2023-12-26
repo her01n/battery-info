@@ -38,5 +38,5 @@
 (add-to-load-path (dirname (current-filename)))
 (use-modules (battery info) (gtk))
 
-(show-battery-info test-get-info)
-(gtk-main)
+(run-battery-info #:get-info test-get-info)
+
