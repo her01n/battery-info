@@ -189,7 +189,7 @@
       #:developers (list "Michal Herko" "lemonzest79")
       #:translator-credits "Albano Battistella"
       #:issue-url "https://github.com/her01n/battery-info/issues"
-      #:license-type 'gpl-3-0 #:version "0.1.1" #:website "https://herko.it/battery-info"
+      #:license-type 'gpl-3-0 #:version "0.2" #:website "https://herko.it/battery-info"
       #:transient-for main-window))
   (present about-window))
 
