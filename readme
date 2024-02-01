@@ -49,8 +49,8 @@ I would wait until this version is released.
   - [x] add taran's upower.xml to repository
   - [x] show the dump button even when no battery is present
   - [x] hide export dump button behind compile-time switch
-  - [ ] merge to main
-  - [ ] update authors
+  - [x] merge to main
+  - [x] update authors
   - [ ] release 0.2
 
 - control with keyboard

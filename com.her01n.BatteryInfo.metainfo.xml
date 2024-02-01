@@ -28,7 +28,9 @@
     https://github.com/her01n/battery-info/issue
   </url>
   <launchable type="desktop-id">com.her01n.BatteryInfo.desktop</launchable>
-  <developer_name>Michal Herko</developer_name>
+  <developer id="michal@herko.it">
+    <name>Michal Herko</name>
+  </developer>
   <translation type="gettext">battery-info</translation>
   <content_rating type="oars-1.1" />
   <project_license>GPL-3.0-or-later</project_license>
