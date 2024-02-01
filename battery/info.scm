@@ -239,17 +239,17 @@
             (else (format #f "~S" args)))))))
   window)
 
-(define (device-property device property)
+(define-public (device-property device property)
   (dbus-call
     'system "org.freedesktop.UPower" device "org.freedesktop.DBus.Properties"
     "Get" "org.freedesktop.UPower.Device" property))
 
-(define (device-names)
+(define-public (device-names)
   (dbus-call
     'system "org.freedesktop.UPower" "/org/freedesktop/UPower"
     "org.freedesktop.UPower" "EnumerateDevices"))
 
-(define-public (get-upower-info)
+(define (get-upower-info)
   (filter identity
     (map
       (lambda (device)
@@ -264,10 +264,19 @@
             (capacity . ,(device-property device "Capacity")))))
       (device-names))))
 
+(define (sxml->xml' a)
+  (define (scheme->string value)
+    (cond
+      ((list? value) (map scheme->string value))
+      ((equal? #t value) "true")
+      ((equal? #f value) "false")
+      (else value)))
+  (sxml->xml (scheme->string a)))
+
 (define-public (all-upower-info)
   (with-output-to-string
     (lambda ()
-      (sxml->xml
+      (sxml->xml'
         (apply list 'devices
           (map
             (lambda (device)
