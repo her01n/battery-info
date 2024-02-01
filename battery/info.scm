@@ -33,9 +33,11 @@
 (bindtextdomain "battery-info" "locale")
 (textdomain "battery-info")
 
+(define show-dump-button #f)
+
 (define (vertical-box . children)
   (define box (make <gtk-box> #:orientation 'vertical))
-  (for-each (lambda (child) (append box child)) children)
+  (for-each (lambda (child) (if child (append box child))) children)
   box)
   
 (define (take-until pred clist)
@@ -48,7 +50,7 @@
   (define children (take-until keyword? args))
   (define keyword-args (drop-until keyword? args))
   (define box (apply make <gtk-box> #:orientation 'horizontal keyword-args))
-  (for-each (lambda (child) (gtk-box-append box child)) children)
+  (for-each (lambda (child) (if child (gtk-box-append box child))) children)
   box)
 
 (define* (h1 title #:key selectable)
@@ -167,7 +169,7 @@
     (make <adw-status-page>
       #:icon-name "system-search-symbolic"
       #:title (gettext "No battery detected."))
-    (buttons-box (dump-button))))
+    (and show-dump-button (buttons-box (dump-button)))))
 
 (define (battery-info info)
   (define view (apply vertical-box (map layout info)))
@@ -176,7 +178,7 @@
       #:overlay-scrolling #f #:child view))
   (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
   (define buttons
-    (buttons-box (copy-button view toast-overlay) (dump-button)))
+    (buttons-box (copy-button view toast-overlay) (and show-dump-button (dump-button))))
   (vertical-box toast-overlay buttons))
 
 (define (show-about main-window)
