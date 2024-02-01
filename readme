@@ -5,6 +5,7 @@
   from http://download.savannah.nongnu.org/releases/guile-lib/
 - g-golf 0.8
   from git://git.savannah.gnu.org/g-golf.git
+- gobject-introspection
 - gtk 4
 - libadwaita 1.3
 
@@ -35,27 +36,38 @@ I would wait until this version is released.
   - [x] display more batteries
   - [x] vertical scrolling,
         make sure the scroll bar is always visible if there is more content
-  - [ ] push into beta branch,
-        branch feature/more-batteries in battery-info
-        branch beta in flathub
-  - [ ] build and publish beta version
-  - [ ] ask lemonzest to test
+  - [x] a way to dump all upower devices
+        a button, that would allow to select a file to save all info
+  - [x] refactor test-ui to use application-run
+  - [x] flatpak build the branch
+  - [x] push into beta branch,
+        branch feature/more-batteries in battery-info and flathub
+  - [x] build and publish test version
+  - [x] ask lemonzest to test
+  - [x] add lemonzest's upower.xml to repository
+  - [x] fix booleans in upower.xml output
+  - [x] add taran's upower.xml to repository
+  - [x] show the dump button even when no battery is present
+  - [x] hide export dump button behind compile-time switch
+  - [ ] merge to main
+  - [ ] update authors
+  - [ ] release 0.2
 
-- keyboard shortcuts
+- control with keyboard
   - [ ] ctrl+w, ctrl+q to close the window
+  - [ ] allow selection over multiple lines
   - [ ] ctrl+a to select all, would this work?
-  - [ ] ctrl+c to copy all the info if nothing is selected?
-        or ctrl+shift+c, or just enter?
+  - [ ] enter to copy all info - make copy button the default button
+      or some other keyboard shortcut
+  - [ ] release 0.3
+
 - do i need to specify the prefix in source for translations?
-- nicer make:
-  - make should build gettext files and pre-compile scheme files
-  - make test should test the application
-  - make install should only install the files
 - post to /r/linux? and hacker news and lemmy
 - gnome software still displays desktop only,
   the app should work on almost anything
 - why does user have application data?
   we should not need to store any data
+- refactor tests to user srfi-64 instead of hdt
 
 - g-irepository-get-infos should work
 - object info from g-irepository-get-info should have nice string representation
