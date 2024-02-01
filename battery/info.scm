@@ -61,11 +61,6 @@
   (start spinner)
   (vertical-box spinner (h1 (gettext "Loading"))))
 
-(define (no-battery)
-  (make <adw-status-page>
-    #:icon-name "system-search-symbolic"
-    #:title (gettext "No battery detected.")))
-
 ; TODO this should be exported by g-golf
 (define (markup-escape-text text)
   ; just do the xml escape
@@ -164,6 +159,16 @@
       (show file-chooser)))
   dump-button)
 
+(define (buttons-box . buttons)
+  (apply horizontal-box (append buttons (list #:margin-top 20 #:halign 'center #:spacing 10))))
+
+(define (no-battery)
+  (vertical-box
+    (make <adw-status-page>
+      #:icon-name "system-search-symbolic"
+      #:title (gettext "No battery detected."))
+    (buttons-box (dump-button))))
+
 (define (battery-info info)
   (define view (apply vertical-box (map layout info)))
   (define scrolled
@@ -171,8 +176,7 @@
       #:overlay-scrolling #f #:child view))
   (define toast-overlay (make <adw-toast-overlay> #:child scrolled))
   (define buttons
-    (horizontal-box (copy-button view toast-overlay) (dump-button)
-      #:margin-top 20 #:halign 'center #:spacing 10))
+    (buttons-box (copy-button view toast-overlay) (dump-button)))
   (vertical-box toast-overlay buttons))
 
 (define (show-about main-window)
