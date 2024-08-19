@@ -19,6 +19,7 @@
 (gi-import-by-name "Gio" "File")
 (gi-import-by-name "Gtk" "Box")
 (gi-import-by-name "Gtk" "Button")
+(gi-import-by-name "Gtk" "EventControllerKey")
 (gi-import-by-name "Gtk" "FileChooserNative")
 (gi-import-by-name "Gtk" "Label")
 (gi-import-by-name "Gtk" "ScrolledWindow")
@@ -205,6 +206,16 @@
 
 (register battery-info-app #f)
 
+(define (install-keyboard-shortcuts window)
+  (define controller (make <gtk-event-controller-key>))
+  (connect controller "key-pressed"
+    (lambda (controller keyval keycode state)
+      (and
+        (equal? '(control-mask) state)
+        (equal? 119 keyval)
+        (close window))))
+  (add-controller window controller))
+
 (define (make-window container)
   (define header (make <adw-header-bar>))
   (define about-button
@@ -216,6 +227,7 @@
   (set-default-size window 440 440)
   (set-content window (vertical-box header container (vertical-glue)))
   (connect about-button 'clicked (lambda args (show-about window)))
+  (install-keyboard-shortcuts window)
   window)
   
 (define (make-container) (make <gtk-box> #:orientation 'vertical))
