@@ -33,9 +33,9 @@ I would wait until this version is released.
 - control with keyboard
   - [x] ctrl+w to close the window
   - [x] allow selection over multiple lines
-  - [ ] ctrl+a to select all, would this work?
-  - [ ] enter to copy all info - make copy button the default button
-      or some other keyboard shortcut
+  - [x] ctrl+a to select all
+  - [ ] enter to copy all info
+    make copy button the default button, or some other keyboard shortcut
   - [ ] release 0.3
 
 - can i tell the main and add-on battery from the object path?

@@ -96,7 +96,7 @@
 
 (define (info-label markup)
   (define label
-    (make <gtk-label> #:selectable #t #:justify 'center #:margin-top 10 #:margin-bottom 10))
+    (make <gtk-label> #:selectable #t #:justify 'center #:margin-top 10 #:margin-bottom 10 #:name "info"))
   (set-markup label markup)
   label)
 
@@ -214,14 +214,22 @@
 
 (register battery-info-app #f)
 
+(define (select-all-info window)
+  (define info-label
+    (find-child window (lambda (widget) (equal? "info" (slot-ref widget 'name)))))
+  (when info-label
+    (select-region info-label 0 -1)
+    (grab-focus info-label)))
+
 (define (install-keyboard-shortcuts window)
   (define controller (make <gtk-event-controller-key>))
   (connect controller "key-pressed"
     (lambda (controller keyval keycode state)
       (and
         (equal? '(control-mask) state)
-        (equal? 119 keyval)
-        (close window))))
+        (or
+          (and (equal? 97 keyval) "a" (begin (select-all-info window) #t))
+          (and (equal? 119 keyval) "w" (begin (close window) #t))))))
   (add-controller window controller))
 
 (define (make-window container)
