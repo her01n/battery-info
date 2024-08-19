@@ -30,39 +30,16 @@ I would wait until this version is released.
   
 ## TODO
   
-- more batteries
-  - [x] branch to test more batteries
-  - [x] bigger window
-  - [x] display more batteries
-  - [x] vertical scrolling,
-        make sure the scroll bar is always visible if there is more content
-  - [x] a way to dump all upower devices
-        a button, that would allow to select a file to save all info
-  - [x] refactor test-ui to use application-run
-  - [x] flatpak build the branch
-  - [x] push into beta branch,
-        branch feature/more-batteries in battery-info and flathub
-  - [x] build and publish test version
-  - [x] ask lemonzest to test
-  - [x] add lemonzest's upower.xml to repository
-  - [x] fix booleans in upower.xml output
-  - [x] add taran's upower.xml to repository
-  - [x] show the dump button even when no battery is present
-  - [x] hide export dump button behind compile-time switch
-  - [x] merge to main
-  - [x] update authors
-  - [ ] release 0.2
-
 - control with keyboard
-  - [ ] ctrl+w, ctrl+q to close the window
-  - [ ] allow selection over multiple lines
+  - [x] ctrl+w to close the window
+  - [x] allow selection over multiple lines
   - [ ] ctrl+a to select all, would this work?
   - [ ] enter to copy all info - make copy button the default button
       or some other keyboard shortcut
   - [ ] release 0.3
 
+- can i tell the main and add-on battery from the object path?
 - do i need to specify the prefix in source for translations?
-- post to /r/linux? and hacker news and lemmy
 - gnome software still displays desktop only,
   the app should work on almost anything
 - why does user have application data?

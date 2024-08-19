@@ -33,7 +33,7 @@
     ((cmd "error") (lambda () (sleep 1) (error "test error")))
     ((cmd "loading") (lambda () (sleep 99) '(((vendor . "ACME")))))
     ((cmd (or "more" "more-batteries")) (delayed (list battery-one battery-two)))
-    (else (error "Please specify test from: good-battery no-battery error loading"))))
+    (else (error "Please specify test from: good-battery more-batteries no-battery error loading"))))
 
 (add-to-load-path (dirname (current-filename)))
 (use-modules (battery info) (gtk))

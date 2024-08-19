@@ -75,10 +75,11 @@
     #:title (gettext "Error reading battery info.")
     #:description (markup-escape-text (exception-message exception))))
 
-(define (info-line description value)
-  (define label (make <gtk-label> #:selectable #t))
-  (set-markup label (format #f "~a <b>~a</b>" description value))
-  label)
+(define (info-line-markup description value)
+  (format #f "~a <b>~a</b>" description value))
+
+(define (header-markup title)
+  (format #f "<span size='x-large' weight='bold' line_height='1.5'>~a</span>" title))
 
 (define (vertical-glue) (make <gtk-label> #:valign 'fill #:vexpand #t))
 
@@ -93,31 +94,38 @@
      (format #f "~a Wh" (/ (round (* value 100)) 100)))
     (else (gettext "Unknown"))))
 
-(define (layout info)
-  (vertical-box
-    (h1
-      (join (gettext "Unknown Battery") (assoc-ref info 'vendor) (assoc-ref info 'model))
-      #:selectable #t)
-    (info-line (gettext "System")
-      (join (gettext "Unknown") (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
-    (info-line (gettext "Technology")
+(define (info-label markup)
+  (define label
+    (make <gtk-label> #:selectable #t #:justify 'center #:margin-top 10 #:margin-bottom 10))
+  (set-markup label markup)
+  label)
+
+(define (info-markup info)
+  (string-join
+    (list
+      (header-markup
+        (join (gettext "Unknown Battery") (assoc-ref info 'vendor) (assoc-ref info 'model)))
+      (info-line-markup (gettext "System")
+        (join (gettext "Unknown") (assoc-ref info 'sys-vendor) (assoc-ref info 'sys-model)))
+      (info-line-markup (gettext "Technology")
       (match (assoc-ref info 'technology)
-        (1 (gettext "Lithium ion"))
-        (2 (gettext "Lithium polymer"))
-        (3 (gettext "Lithium iron phosphate"))
-        (4 (gettext "Lead acid"))
-        (5 (gettext "Nickel cadmium"))
-        (6 (gettext "Nickel metal hydride"))
-        (else (gettext "Unknown"))))
-    (info-line (gettext "Nominal capacity")
-      (capacity->string (assoc-ref info 'energy-full-design)))
-    (info-line (gettext "Actual capacity")
-      (capacity->string (assoc-ref info 'energy-full)))
-    (info-line (gettext "Capacity percentage")
-      (match (assoc-ref info 'capacity)
-        ((and (? real?) (not 0.0) capacity)
-         (format #f "~a%" (inexact->exact (round capacity))))
-        (else (gettext "Unknown"))))))
+          (1 (gettext "Lithium ion"))
+          (2 (gettext "Lithium polymer"))
+          (3 (gettext "Lithium iron phosphate"))
+          (4 (gettext "Lead acid"))
+          (5 (gettext "Nickel cadmium"))
+          (6 (gettext "Nickel metal hydride"))
+          (else (gettext "Unknown"))))
+      (info-line-markup (gettext "Nominal capacity")
+        (capacity->string (assoc-ref info 'energy-full-design)))
+      (info-line-markup (gettext "Actual capacity")
+        (capacity->string (assoc-ref info 'energy-full)))
+      (info-line-markup (gettext "Capacity percentage")
+        (match (assoc-ref info 'capacity)
+          ((and (? real?) (not 0.0) capacity)
+           (format #f "~a%" (inexact->exact (round capacity))))
+          (else (gettext "Unknown")))))
+    "\n"))
 
 (define (copy-to-clipboard text)
   (define clipboard (get-clipboard (gdk-display-get-default)))
@@ -173,7 +181,7 @@
     (and show-dump-button (buttons-box (dump-button)))))
 
 (define (battery-info info)
-  (define view (apply vertical-box (map layout info)))
+  (define view (info-label (string-join (map info-markup info) "\n")))
   (define scrolled
     (make <gtk-scrolled-window> #:propagate-natural-height #t #:width-request 120 #:height-request 100
       #:overlay-scrolling #f #:child view))
