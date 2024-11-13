@@ -17,16 +17,9 @@
       <li>Capacity ratio</li>
     </ul>
   </description>
-  <categories>
-    <category>System</category>
-    <category>Utilities</category>
-  </categories>
-  <url type="homepage">
-    https://herko.it/battery-info
-  </url>
-  <url type="bugtracker">
-    https://github.com/her01n/battery-info/issue
-  </url>
+  <url type="homepage">https://herko.it/battery-info</url>
+  <url type="bugtracker">https://github.com/her01n/battery-info/issues</url>
+  <url type="vcs-browser">https://github.com/her01n/battery-info</url>
   <launchable type="desktop-id">com.her01n.BatteryInfo.desktop</launchable>
   <developer_name>Michal Herko</developer_name>
   <translation type="gettext">battery-info</translation>
