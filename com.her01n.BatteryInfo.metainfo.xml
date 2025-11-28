@@ -58,5 +58,10 @@
   <recommends>
     <display_length compare="ge">400</display_length>
   </recommends>
+  <keywords>
+    <keyword>battery info</keyword>
+    <keyword>battery health</keyword>
+    <keyword>laptop battery</keyword>
+  </keywords>
 </component>
 
